@@ -34,6 +34,9 @@ function love.load()
     love.window.setIcon(gameIcon)
     love.window.setTitle(consts.GAME_TITLE)
 
+    -- === Load sprites ===
+    assets.tileset = love.graphics.newImage(res.TILESET)
+
     -- === Load sounds ===
     assets.titleSound = love.audio.newSource(res.EDIT_SOUND, "stream")
     assets.titleSound:setLooping(true)

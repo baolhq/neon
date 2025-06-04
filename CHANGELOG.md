@@ -4,7 +4,7 @@
 
 Some real juicy stuff here, check this out!
 
-- Add tweening animation
+- Add animations for the player
 - Add jumping logic for the player
 - Add moving obstacle along the way
 - Add glitching shader for title 🔥

@@ -20,7 +20,7 @@ function mainScene:load(assets, actions, configs)
     self.isPaused   = false
     self.isGameOver = false
 
-    player:init()
+    player:init(self.assets.tileset)
 end
 
 function mainScene:unload()
@@ -88,7 +88,7 @@ function mainScene:draw()
     local laneRightX = consts.WINDOW_WIDTH - consts.LANE_WIDTH
     love.graphics.rectangle("fill", laneRightX, 0, consts.LANE_WIDTH, consts.WINDOW_HEIGHT)
 
-    player:draw()
+    player:draw(self.assets.tileset)
 
     -- Draw obstacles
     for _, o in ipairs(self.obstacles) do

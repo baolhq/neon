@@ -2,6 +2,7 @@
 return {
     -- Images
     GAME_ICON = "res/img/icon.png",
+    TILESET = "res/img/tileset.png",
     PARTICLE = "res/img/rectangle.png",
 
     -- Shaders
