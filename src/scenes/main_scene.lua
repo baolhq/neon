@@ -49,6 +49,12 @@ function mainScene:handleInputs()
         self.isGameOver = false
         self:unload()
     end
+
+    if input:wasPressed("left") and player.lane == 2 then
+        player:jump()
+    elseif input:wasPressed("right") and player.lane == 1 then
+        player:jump()
+    end
 end
 
 function mainScene:update(dt)

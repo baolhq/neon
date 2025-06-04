@@ -46,6 +46,11 @@ function love.load()
     assets.clickSound = love.audio.newSource(res.CLICK_SOUND, "static")
     assets.clickSound:setVolume(0.5)
 
+    -- === Load shaders ===
+    assets.waveShader = love.graphics.newShader(res.WAVE_SHADER)
+    assets.bloomShader = love.graphics.newShader(res.BLOOM_SHADER)
+    assets.glitchShader = love.graphics.newShader(res.GLITCH_SHADER)
+
     -- Load configs and start game
     configs = file.loadConfigs()
     sceneManager:load(assets, configs)
