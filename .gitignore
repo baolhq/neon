@@ -1,0 +1,9 @@
+# Ignore build directory
+bin/
+
+# Ignore environment variables
+**/*.env
+
+# Ignore other IDE settings
+.vs/
+.idea/
