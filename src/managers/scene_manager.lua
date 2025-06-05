@@ -1,10 +1,10 @@
-local sceneManager = {
-    assets  = {},
-    configs = {},
-    current = "title",
-}
+local tween        = require("lib.tween")
+local colors       = require("src.globals.colors")
 
-local scenes = {
+local sceneManager = {}
+
+-- === Game scenes ===
+local scenes       = {
     title = require("src.scenes.title_scene"),
     main = require("src.scenes.main_scene"),
     lboard = require("src.scenes.lboard_scene"),
@@ -12,25 +12,34 @@ local scenes = {
 }
 
 function sceneManager:load(assets, configs)
-    self.assets = assets
-    self.configs = configs
+    self.assets        = assets
+    self.configs       = configs
+    self.current       = "title"
+    self.next          = nil
+    self.transitioning = false
+    self.coverX        = nil -- For black rectangle
+    self.stage         = nil -- 'in' -> switch -> 'out'
+    self.tween         = nil
+    self.actions       = {
+        switchScene = function(newScene)
+            self:switch(newScene)
+        end,
+        quit = function() love.event.quit() end
+    }
 
-    self:switch(self.current, assets, configs)
+    -- Don't use transition on initial load
+    scenes[self.current]:load(self.assets, self.actions, self.configs)
 end
 
-function sceneManager:switch(name, assets, configs)
-    if scenes[name].load then
-        local actions = {
-            switchScene = function(newScene)
-                self:switch(newScene, assets, configs)
-            end,
-            quit = function()
-                love.event.quit()
-            end
-        }
-        self.current = name
-        scenes[name]:load(assets, actions, configs)
-    end
+function sceneManager:switch(name)
+    if self.transitioning then return end
+
+    self.transitioning = true
+    self.next = name
+    self.coverX = love.graphics.getWidth()
+    self.stage = "in"
+
+    self.tween = tween.new(0.4, self, { coverX = 0 }, "outQuad")
 end
 
 function sceneManager:mousemoved(x, y, dx, dy, isTouch)
@@ -46,6 +55,29 @@ function sceneManager:mousepressed(x, y, btn)
 end
 
 function sceneManager:update(dt)
+    if self.transitioning and self.tween then
+        local complete = self.tween:update(dt)
+        if complete then
+            if self.stage == "in" then
+                -- Now switch scenes under the black cover
+                self.current = self.next
+                scenes[self.current]:load(self.assets, self.actions, self.configs)
+
+                -- Start swipe out
+                self.stage = "out"
+                self.coverX = 0
+                self.tween = tween.new(0.4, self, { coverX = -love.graphics.getWidth() }, "inQuad")
+            else
+                -- Finished transition
+                self.transitioning = false
+                self.tween = nil
+                self.stage = nil
+                self.next = nil
+                self.coverX = nil
+            end
+        end
+    end
+
     if scenes[self.current].update then
         scenes[self.current]:update(dt)
     end
@@ -54,6 +86,12 @@ end
 function sceneManager:draw()
     if scenes[self.current].draw then
         scenes[self.current]:draw()
+    end
+
+    -- Draw the curtain if in transition
+    if self.transitioning and self.coverX then
+        love.graphics.setColor(colors.SLATE_100)
+        love.graphics.rectangle("fill", self.coverX, 0, love.graphics.getWidth(), love.graphics.getHeight())
     end
 end
 

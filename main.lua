@@ -51,8 +51,6 @@ function love.load()
     assets.clickSound:setVolume(0.5)
 
     -- === Load shaders ===
-    assets.cmsShader = moonshine(moonshine.effects.chromasep)
-    assets.cmsShader.chromasep.radius = 2
     assets.glowShader = moonshine(moonshine.effects.glow)
     assets.sclShader = moonshine(moonshine.effects.scanlines)
     assets.sclShader.scanlines.thickness = 0.1

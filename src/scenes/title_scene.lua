@@ -1,3 +1,4 @@
+local moonshine    = require("lib.moonshine")
 local colors       = require("src.globals.colors")
 local consts       = require("src.globals.consts")
 local res          = require("src.globals.res")
@@ -36,17 +37,24 @@ local buttons      = {
 }
 
 function titleScene:load(assets, actions, configs)
-    self.assets        = assets
-    self.actions       = actions
-    self.configs       = configs
+    self.assets       = assets
+    self.actions      = actions
+    self.configs      = configs
 
-    local spacingY     = 48
-    buttons.start.x    = (love.graphics.getWidth() - buttons.start.width) / 2
-    buttons.start.y    = (love.graphics.getHeight() - buttons.start.height) / 2 + 28
-    buttons.lboard.x   = buttons.start.x
-    buttons.lboard.y   = buttons.start.y + spacingY
-    buttons.settings.x = buttons.lboard.x
-    buttons.settings.y = buttons.lboard.y + spacingY
+    -- Draw buttons with spacings
+    local spacingY    = 8
+    local totalHeight = #buttonOrder * buttons.start.height + (#buttonOrder - 1) * spacingY
+    local startY      = (love.graphics.getHeight() - totalHeight) / 2 + 88
+
+    for i = 1, #buttonOrder do
+        local button = buttons[buttonOrder[i]]
+        button.x = (love.graphics.getWidth() - button.width) / 2
+        button.y = startY + (i - 1) * (button.height + spacingY)
+    end
+
+    self.cmsShader                  = moonshine(moonshine.effects.chromasep)
+    self.cmsShader.chromasep.angle  = -math.pi / 4
+    self.cmsShader.chromasep.radius = 4
 
     self.assets.titleSound:play()
 end
@@ -115,7 +123,7 @@ end
 
 function titleScene:draw()
     local font = file:getFont(res.MAIN_FONT, consts.FONT_TITLE_SIZE)
-    self.assets.cmsShader(function()
+    self.cmsShader(function()
         love.graphics.clear(colors.SLATE_100)
         drawer.drawCenteredText(consts.GAME_TITLE, font, 0, -68)
     end)

@@ -18,11 +18,12 @@ function drawer.drawButton(btn, font)
     -- Draw background
     if btn.active then
         -- Active button effect
+        love.graphics.setColor(colors.SLATE_800)
+        love.graphics.setLineWidth(2)
+        love.graphics.rectangle("line", btn.x, btn.y, btn.width, btn.height, 4, 4)
+
         love.graphics.setColor(colors.SLATE_400)
-    else
-        love.graphics.setColor(colors.SLATE_200)
     end
-    love.graphics.rectangle("fill", btn.x, btn.y, btn.width, btn.height, 4, 4)
 
     -- Button text
     love.graphics.setColor(1, 1, 1)

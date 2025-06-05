@@ -41,17 +41,20 @@ local buttons       = {
 }
 
 function settingsScene:load(assets, actions, configs)
-    self.assets          = assets
-    self.actions         = actions
-    self.configs         = configs
+    self.assets    = assets
+    self.actions   = actions
+    self.configs   = configs
 
-    local spacingY       = 48
-    buttons.music.x      = (love.graphics.getWidth() - buttons.music.width) / 2
-    buttons.music.y      = (love.graphics.getHeight() - buttons.music.height) / 2 + 28
-    buttons.difficulty.x = buttons.music.x
-    buttons.difficulty.y = buttons.music.y + spacingY
-    buttons.back.x       = buttons.difficulty.x
-    buttons.back.y       = buttons.difficulty.y + spacingY
+    -- Draw buttons with spacings
+    local spacingY    = 8
+    local totalHeight = #buttonOrder * buttons.music.height + (#buttonOrder - 1) * spacingY
+    local startY      = (love.graphics.getHeight() - totalHeight) / 2 + 88
+
+    for i = 1, #buttonOrder do
+        local button = buttons[buttonOrder[i]]
+        button.x = (love.graphics.getWidth() - button.width) / 2
+        button.y = startY + (i - 1) * (button.height + spacingY)
+    end
 
     if configs.music then
         local state = configs.music == "true"
@@ -149,7 +152,7 @@ end
 function settingsScene:draw()
     love.graphics.clear(colors.SLATE_100)
 
-    local font = file:getFont(res.MAIN_FONT, consts.FONT_TITLE_SIZE)
+    local font = file:getFont(res.MAIN_FONT, consts.FONT_HEADER_SIZE)
     drawer.drawCenteredText("SETTINGS", font, 0, -68)
 
     font = file:getFont(res.MAIN_FONT, consts.FONT_SUB_SIZE)
