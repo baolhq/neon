@@ -6,6 +6,8 @@ local obstacle = {}
 
 -- === Constants ===
 local POOL_SIZE = 20
+local SCALE = 2
+local FRAME_W, FRAME_H = 16, 16
 
 -- === Pooling ===
 local pool = {}
@@ -54,8 +56,12 @@ local function validatePattern(p)
     end
 end
 
-local function spawn(side, mode)
-    local o = { w = 32, h = 16, }
+local function spawn(side, mode, anim)
+    local o = {
+        w = FRAME_W * SCALE,
+        h = FRAME_H * SCALE,
+        anim = anim
+    }
 
     if mode == 1 then
         o.speed = 200
@@ -77,7 +83,7 @@ local function spawn(side, mode)
     return o
 end
 
-local function createPool(mode)
+local function createPool(mode, anim)
     local presets = {}
     if mode == 1 then
         presets = ptCasual
@@ -92,24 +98,44 @@ local function createPool(mode)
     end
 
     for i = 1, POOL_SIZE do
-        table.insert(pool, spawn(pattern[i], mode))
+        table.insert(pool, spawn(pattern[i], mode, anim))
     end
 
     validatePattern(pattern)
 end
 
-function obstacle.get(mode)
-    if #pool == 0 then createPool(mode) end
+function obstacle.get(mode, anim)
+    if #pool == 0 then createPool(mode, anim) end
     return table.remove(pool)
 end
 
 function obstacle:update(dt)
     self.pos.y = self.pos.y + self.speed * dt
+    self.anim:update(dt)
 end
 
-function obstacle:draw()
-    love.graphics.setColor(colors.SLATE_400)
-    love.graphics.rectangle("fill", self.pos.x, self.pos.y, self.w, self.h)
+function obstacle:draw(tileset)
+    love.graphics.setColor(colors.SLATE_800)
+
+    local oX, oY = self.w / 2, self.h / 2
+    local rotation, facingDir
+    if self.pos.x + oX > love.graphics.getWidth() / 2 then
+        rotation = -math.pi / 2
+        facingDir = 1
+    else
+        rotation = math.pi / 2
+        facingDir = -1
+    end
+    self.anim:draw(
+        tileset,
+        -- Offset to fix visual
+        self.pos.x + oX - 9 * facingDir,
+        self.pos.y + oY,
+        rotation,
+        -- Scale up to match its collision box
+        SCALE * facingDir * 1.5, SCALE * 1.5,
+        FRAME_W / 2, FRAME_H / 2
+    )
 end
 
 return obstacle

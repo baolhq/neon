@@ -6,7 +6,8 @@ local collider = require("src.utils.collider")
 
 local player   = {}
 
-function player:init(tileset)
+function player:init(anim)
+    self.anim      = anim
     self.w, self.h = 48, 48
     self.speed     = 200
     self.lane      = 1 -- 1=left, 2=right
@@ -17,10 +18,6 @@ function player:init(tileset)
         consts.LANE_WIDTH,
         consts.WINDOW_HEIGHT * 0.75
     )
-
-    -- Animation
-    local grid     = anim8.newGrid(16, 16, tileset:getWidth(), tileset:getHeight())
-    self.animation = anim8.newAnimation(grid("1-4", 1), 0.1)
 end
 
 -- === Behavior ===
@@ -34,7 +31,7 @@ function player:update(dt)
     then
         self.jumpDir = 0
         self.jumpsLeft = self.maxJumps
-        self.animation:update(dt)
+        self.anim:update(dt)
     end
 end
 
@@ -107,7 +104,7 @@ function player:draw(tileset)
         facingDir = -1
     end
 
-    self.animation:draw(
+    self.anim:draw(
         tileset,
         self.pos.x + oX,
         self.pos.y + oY,
