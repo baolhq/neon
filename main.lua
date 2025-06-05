@@ -76,12 +76,16 @@ function love.mousemoved(x, y, dx, dy, isTouch)
     sceneManager:mousemoved(x, y, dx, dy, isTouch)
 end
 
-function love.mousepressed(x, y, btn)
-    sceneManager:mousepressed(x, y, btn)
+function love.mousepressed(x, y, btn, isTouch, presses)
+    sceneManager:mousepressed(x, y, btn, isTouch, presses)
+end
+
+function love.mousereleased(x, y, btn, isTouch, presses)
+    sceneManager:mousereleased(x, y, btn, isTouch, presses)
 end
 
 function love.update(dt)
-    scanlinesTime = scanlinesTime + dt * 5
+    scanlinesTime = scanlinesTime + dt * 40
     assets.sclShader.scanlines.phase = scanlinesTime
 
     sceneManager:update(dt)

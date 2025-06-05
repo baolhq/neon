@@ -76,7 +76,7 @@ function titleScene:mousemoved(x, y, dx, dy, isTouch)
     end
 end
 
-function titleScene:mousepressed(x, y, btn)
+function titleScene:mousepressed(x, y, btn, isTouch, presses)
     self.assets.clickSound:play()
     for _, b in pairs(buttons) do
         b.focused = false

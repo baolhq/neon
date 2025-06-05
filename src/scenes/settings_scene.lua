@@ -8,7 +8,7 @@ local input         = require("src.utils.input")
 local settingsScene = {}
 
 local focusedIndex  = 1
-local buttonOrder   = { "music", "difficulty", "back" }
+local buttonOrder   = { "music", "mode", "back" }
 local buttons       = {
     music = {
         x = 0,
@@ -20,14 +20,14 @@ local buttons       = {
         toggle = true,
         state = true, -- true = ON, false = OFF
     },
-    difficulty = {
+    mode = {
         x = 0,
         y = 0,
         width = 200,
         height = 40,
-        text = "DIFFICULTY: NORMAL",
-        options = { "EASY", "NORMAL", "HARD" },
-        index = 2,
+        text = "MODE: NORMAL",
+        options = { "NORMAL", "HARD", "INSANE" },
+        index = 1,
         active = false,
     },
     back = {
@@ -41,9 +41,9 @@ local buttons       = {
 }
 
 function settingsScene:load(assets, actions, configs)
-    self.assets    = assets
-    self.actions   = actions
-    self.configs   = configs
+    self.assets       = assets
+    self.actions      = actions
+    self.configs      = configs
 
     -- Draw buttons with spacings
     local spacingY    = 8
@@ -62,10 +62,10 @@ function settingsScene:load(assets, actions, configs)
         buttons.music.text = state and "MUSIC: ON" or "MUSIC: OFF"
     end
 
-    if configs.diff then
-        local id = tonumber(configs.diff)
-        buttons.difficulty.index = id
-        buttons.difficulty.text = "DIFFICULTY: " .. buttons.difficulty.options[id]
+    if configs.mode then
+        local id = tonumber(configs.mode)
+        buttons.mode.index = id
+        buttons.mode.text = "MODE: " .. buttons.mode.options[id]
     end
 end
 
@@ -76,10 +76,10 @@ local function updateMusicBtn(btn, cfg)
     file.saveConfigs(cfg)
 end
 
-local function updateDiffBtn(btn, cfg)
+local function updateModeBtn(btn, cfg)
     btn.index = btn.index % #btn.options + 1
-    btn.text = "MUISC: " .. btn.options[btn.index]
-    cfg.diff = btn.index
+    btn.text = "MODE: " .. btn.options[btn.index]
+    cfg.mode = btn.index
     file.saveConfigs(cfg)
 end
 
@@ -91,8 +91,8 @@ function settingsScene:handleInputs()
     if input:wasPressed("accept") then
         if buttons.music.active then
             updateMusicBtn(buttons.music, self.configs)
-        elseif buttons.difficulty.active then
-            updateDiffBtn(buttons.difficulty, self.configs)
+        elseif buttons.mode.active then
+            updateModeBtn(buttons.mode, self.configs)
         else
             self.actions.switchScene("title")
         end
@@ -128,7 +128,7 @@ function settingsScene:mousemoved(x, y, dx, dy, isTouch)
     end
 end
 
-function settingsScene:mousepressed(x, y, btn)
+function settingsScene:mousepressed(x, y, btn, isTouch, presses)
     self.assets.clickSound:play()
     if btn ~= 1 then return end -- left click only
 
@@ -136,8 +136,8 @@ function settingsScene:mousepressed(x, y, btn)
         if b.active then
             if name == "music" and b.toggle then
                 updateMusicBtn(b, self.configs)
-            elseif name == "difficulty" and b.options then
-                updateDiffBtn(b, self.configs)
+            elseif name == "mode" and b.options then
+                updateModeBtn(b, self.configs)
             elseif name == "back" then
                 self.actions.switchScene("title")
             end

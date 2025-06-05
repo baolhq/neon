@@ -8,7 +8,7 @@ local player        = require("src.models.player")
 local obstacle      = require("src.models.obstacle")
 
 -- === Constants ===
-local OBS_THRESHOLD = 2
+local OBS_THRESHOLD = 0.5
 
 local mainScene     = {}
 
@@ -27,17 +27,14 @@ function mainScene:load(assets, actions, configs)
     player:init(self.assets.tileset)
 end
 
-function mainScene:unload()
+function mainScene:reload()
     for i = #self.obstacles, 1, -1 do
         table.remove(self.obstacles, i)
     end
     self.obstacles = {}
-end
 
-function mainScene:mousepressed(x, y, btn)
-    if btn == 1 then
-        player:jump()
-    end
+    self.isGameOver = false
+    self.actions.switchScene("main")
 end
 
 function mainScene:handleInputs()
@@ -50,14 +47,29 @@ function mainScene:handleInputs()
     end
 
     if input:wasPressed("accept") and self.isGameOver then
-        self.isGameOver = false
-        self:unload()
+        self:reload()
     end
 
-    if input:wasPressed("left") and player.lane == 2 then
-        player:jump()
-    elseif input:wasPressed("right") and player.lane == 1 then
-        player:jump()
+    if input:isDown("left") or input:isDown("right") then
+        player:jumpStart()
+    elseif input:keyreleased("left") or input:keyreleased("right") then
+        player:jumpEnd()
+    end
+end
+
+function mainScene:mousepressed(x, y, btn, isTouch, presses)
+    if btn == 1 then
+        if self.isGameOver then
+            self:reload()
+        else
+            player:jumpStart()
+        end
+    end
+end
+
+function mainScene:mousereleased(x, y, btn, isTouch, presses)
+    if btn == 1 then
+        player:jumpEnd()
     end
 end
 
@@ -68,7 +80,8 @@ function mainScene:update(dt)
     -- Spawn obstacles
     self.obsTimer = self.obsTimer + dt
     if self.obsTimer > OBS_THRESHOLD then
-        local newObs = obstacle.get()
+        local m = tonumber(self.configs.mode)
+        local newObs = obstacle.get(m)
         table.insert(self.obstacles, newObs)
         self.obsTimer = 0
     end
@@ -92,6 +105,11 @@ function mainScene:draw()
         love.graphics.rectangle("fill", 0, 0, consts.LANE_WIDTH, consts.WINDOW_HEIGHT)
         local laneRightX = consts.WINDOW_WIDTH - consts.LANE_WIDTH
         love.graphics.rectangle("fill", laneRightX, 0, consts.LANE_WIDTH, consts.WINDOW_HEIGHT)
+
+        -- Draw center line
+        local cX = love.graphics.getWidth() / 2
+        love.graphics.setColor(colors.SLATE_200)
+        love.graphics.rectangle("line", cX, 0, 1, consts.WINDOW_HEIGHT)
 
         player:draw(self.assets.tileset)
 

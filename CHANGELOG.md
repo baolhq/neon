@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.4
+
+Revamped jumping logics, add visual guide, and catching some bugs 🐛
+
+- Update jumping control to feel more "natural"
+- Add animated scene transition
+- Add pseudo random obstacle generator
+- Minor bugs catched
+
 ## 0.0.3
 
 Just discovered moonshine, it's free real estate!

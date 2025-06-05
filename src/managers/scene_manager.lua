@@ -48,9 +48,15 @@ function sceneManager:mousemoved(x, y, dx, dy, isTouch)
     end
 end
 
-function sceneManager:mousepressed(x, y, btn)
+function sceneManager:mousepressed(x, y, btn, isTouch, presses)
     if scenes[self.current].mousepressed then
-        scenes[self.current]:mousepressed(x, y, btn)
+        scenes[self.current]:mousepressed(x, y, btn, isTouch, presses)
+    end
+end
+
+function sceneManager:mousereleased(x, y, btn, isTouch, presses)
+    if scenes[self.current].mousereleased then
+        scenes[self.current]:mousereleased(x, y, btn, isTouch, presses)
     end
 end
 

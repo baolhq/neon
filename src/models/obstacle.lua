@@ -10,17 +10,64 @@ local POOL_SIZE = 20
 -- === Pooling ===
 local pool = {}
 
-local function spawn()
-    local o = {
-        speed = 300,
-        w = 32,
-        h = 16,
-    }
+-- === Pseudo Random ===
+local ptCasual = {
+    "lllrlrrrllrlrlllrrlr",
+    "rlrlrrrlrlllrrllrlrr",
+    "llrrllrlrrlllrrrlrlr",
+    "rrllrrrllrlrlrrlllrl",
+    "lrlrrllrlrrlllrlrrlr",
+    "rllrllrrrlrlrllrlrrl",
+    "llrlrlrrllrrrllrlrlr",
+    "rrlrrllrllrlrrllrlrl",
+    "lrrllrrrlllrllrrrlrl",
+    "rllrrllrlrrllrlrllrr",
+}
+local ptHard = {
+    "llllrrllrrrllllrrllr",
+    "rrrrllrrrllllrrllrlr",
+    "lllrrrllllrrrlllrrrl",
+    "rrrrrlllrllrrlllrrrl",
+    "lllrrllllrrrlrrrllrl",
+    "rrrrlllrrrlrrllllrrl",
+    "llrrrllllrrlllrrrllr",
+    "rrrlllrrrrllrrlllrrl",
+    "llllrrrlllrrrllllrrl",
+    "rrrllllrrrllllrrrllr",
+}
 
-    -- Spawn on random side
+---Validate pattern length and randomness
+---@param p table
+local function validatePattern(p)
+    assert(#p == POOL_SIZE, "Pattern length must be the same as POOL_SIZE")
+
+    local count = 1
+    for i = 2, #p do
+        if p[i] == p[i + 1] then
+            count = count + 1
+            if count > 5 then
+                error("Too many of the same side in a row: " .. p)
+            end
+        else
+            count = 1
+        end
+    end
+end
+
+local function spawn(side, mode)
+    local o = { w = 32, h = 16, }
+
+    if mode == 1 then
+        o.speed = 200
+    elseif mode == 2 then
+        o.speed = 300
+    else
+        o.speed = 400
+    end
+
     local lX = consts.LANE_WIDTH
     local rX = consts.WINDOW_WIDTH - consts.LANE_WIDTH - o.w
-    if love.math.random(2) == 1 then
+    if side == "l" then
         o.pos = vector(lX, -100)
     else
         o.pos = vector(rX, -100)
@@ -30,15 +77,29 @@ local function spawn()
     return o
 end
 
-local function createPool()
-    for i = 1, POOL_SIZE do
-        local o = spawn()
-        table.insert(pool, o)
+local function createPool(mode)
+    local presets = {}
+    if mode == 1 then
+        presets = ptCasual
+    elseif mode == 2 then
+        presets = ptHard
     end
+
+    local rand = love.math.random(1, #presets)
+    local pattern = {}
+    for i = 1, #presets[rand] do
+        pattern[i] = presets[rand]:sub(i, i)
+    end
+
+    for i = 1, POOL_SIZE do
+        table.insert(pool, spawn(pattern[i], mode))
+    end
+
+    validatePattern(pattern)
 end
 
-function obstacle.get()
-    if #pool == 0 then createPool() end
+function obstacle.get(mode)
+    if #pool == 0 then createPool(mode) end
     return table.remove(pool)
 end
 

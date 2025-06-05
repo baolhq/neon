@@ -1,65 +1,85 @@
-local anim8         = require("lib.anim8")
-local tween         = require("lib.tween")
-local vector        = require("lib.vector")
-local colors        = require("src.globals.colors")
-local consts        = require("src.globals.consts")
-local collider      = require("src.utils.collider")
+local anim8    = require("lib.anim8")
+local vector   = require("lib.vector")
+local colors   = require("src.globals.colors")
+local consts   = require("src.globals.consts")
+local collider = require("src.utils.collider")
 
-local player        = {}
-
--- === Constants ===
-local FLIP_DURATION = 0.5
+local player   = {}
 
 function player:init(tileset)
-    self.w, self.h  = 48, 48
-    self.speed      = 400
-    self.lane       = 1 -- 1=left, 2=right
-    self.isFlipping = false
-    self.flipTimer  = FLIP_DURATION
-    self.pos        = vector(
+    self.w, self.h = 48, 48
+    self.speed     = 200
+    self.lane      = 1 -- 1=left, 2=right
+    self.maxJumps  = 2
+    self.jumpsLeft = self.maxJumps
+    self.jumpDir   = 0 -- 0=normal, -1=jump left, 1=jump right
+    self.pos       = vector(
         consts.LANE_WIDTH,
         consts.WINDOW_HEIGHT * 0.75
     )
 
     -- Animation
-    local grid      = anim8.newGrid(16, 16, tileset:getWidth(), tileset:getHeight())
-    self.animation  = anim8.newAnimation(grid("1-4", 1), 0.1)
+    local grid     = anim8.newGrid(16, 16, tileset:getWidth(), tileset:getHeight())
+    self.animation = anim8.newAnimation(grid("1-4", 1), 0.1)
 end
 
 -- === Behavior ===
 function player:update(dt)
-    if self.isFlipping then
-        self.flipTimer = self.flipTimer - dt
+    self.pos.x = self.pos.x + self.speed * dt * self.jumpDir
 
-        -- Flip animation
-        if self.posTween then
-            self.posTween:update(dt)
-        end
-
-        -- Animation timed out
-        if self.flipTimer <= 0 then
-            self.isFlipping = false
-            self.flipTimer = FLIP_DURATION
-            self.lane = self.lane == 1 and 2 or 1
-        end
-    else
+    local leftW = consts.LANE_WIDTH
+    local rightW = consts.WINDOW_WIDTH - consts.LANE_WIDTH
+    if self.pos.x <= leftW or
+        self.pos.x + self.w >= rightW
+    then
+        self.jumpDir = 0
+        self.jumpsLeft = self.maxJumps
         self.animation:update(dt)
     end
 end
 
-function player:jump()
-    if not self.isFlipping then
-        self.isFlipping = true
-        self.flipTimer = FLIP_DURATION
+function player:jumpStart()
+    if self.jumpsLeft <= 0 then return end
+    self.jumpsLeft = self.jumpsLeft - 1
 
-        local newX
-        if self.lane == 1 then
-            newX = consts.WINDOW_WIDTH - consts.LANE_WIDTH - self.w
-        else
-            newX = consts.LANE_WIDTH
+    if self.lane == 1 then
+        if self.pos.x + self.w < consts.WINDOW_WIDTH - consts.LANE_WIDTH then
+            self.jumpDir = 1
         end
 
-        self.posTween = tween.new(FLIP_DURATION, self.pos, { x = newX }, "outQuart")
+        if self.pos.x > love.graphics.getWidth() / 2 then
+            self.jumpDir = -1
+            self.lane = 2
+        end
+    else
+        if self.pos.x + self.w > consts.LANE_WIDTH then
+            self.jumpDir = -1
+        end
+
+        if self.pos.x < love.graphics.getWidth() / 2 then
+            self.jumpDir = -1
+            self.lane = 1
+        end
+    end
+end
+
+function player:jumpEnd()
+    local leftW = consts.LANE_WIDTH
+    local rightW = consts.WINDOW_WIDTH - consts.LANE_WIDTH
+
+    -- Only change jumpDir if not touching wall
+    if self.pos.x <= leftW or self.pos.x + self.w >= rightW then
+        self.jumpDir = 0
+        return
+    end
+
+    -- Snap to closest wall
+    if self.pos.x + self.w / 2 < love.graphics.getWidth() / 2 then
+        self.jumpDir = -1
+        self.lane = 1
+    else
+        self.jumpDir = 1
+        self.lane = 2
     end
 end
 
