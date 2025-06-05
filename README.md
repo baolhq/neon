@@ -1,19 +1,17 @@
 # NEÖN
 
-A hyper-fast, shader-soaked trip through the cyberspace.
-
-Dodge. Jump. Drift through light.
-
 In NEÖN, you’re a lone runner hurtling through a glowing tunnel of chaos. Your mission? Survive the surge, collect energy orbs, and dodge deadly obstacles by jumping left or right at hyperspeed.
 
-Powered by Love2D shaders, the world of NEÖN pulses with life — bloom, blur, and distortion effects react to your every move. Crank up your reflexes and ride the light.
+Powered by [moonshine](https://github.com/vrld/moonshine) shaders, the world of NEÖN pulses with life — bloom, blur, and distortion effects react to your every move. Crank up your reflexes and ride the light.
+
+Made with LÖVE™.
 
 ## Player Manual
 
-1. Jump with `Left/Right Arrow Keys` or `Left Mouse Button`
-2. Avoid deadly obstacles and collect as much energies as you can
-3. Go back or exit with <code>Esc</code>
-4. Pause and resume with <code>Space</code>
+1. Control: `A` or `Left` and `D` or `Right` to jump
+2. Mouse: `Left Button` to also jump.
+3. Menu: `Tab` or `Up` and `Down` to navigate menu
+4. Action: `Space` or `Enter` to pause/resume or restart, `Esc` to go back
 
 ## Building
 
@@ -32,12 +30,6 @@ pip3 install setuptools
 pip3 install makelove
 ```
 
-Then run this command to build
-
-```sh
-makelove --config build_config.toml
-```
-
 ### Installation
 
 Clone the repository:
@@ -45,6 +37,12 @@ Clone the repository:
 ```sh
 git clone https://github.com/baolhq/neon.git
 cd neon && code .
+```
+
+Then run this command to build
+
+```sh
+makelove --config build_config.toml
 ```
 
 ## Executing
@@ -61,18 +59,15 @@ To build and run the project:
 ├── main.lua                # Entry point
 ├── conf.lua                # Startup configurations
 ├── build_config.toml       # Setup for cross-platforms building
-├── /lib                    # Third-party libraries
-├── /src                    # Game source code
-│   ├── entities/           # Game entities
-│   ├── global/             # Global variables
-│   ├── managers/           # Manage screens, inputs, game states etc..
-│   ├── screens/            # Game screens
-│   └── util/               # Helper functions
-├── /res                    # Static resources
-│   ├── img/                # Sprites, textures etc..
-│   ├── audio/              # Sound effects
-│   └── font/               # Recommended fonts
 ├── /.vscode                # VSCode launch, debug and build setup
+├── /lib                    # Third-party libraries
+├── /res                    # Static resources
+├── /src                    # Game source code
+│   ├── models/             # Game entities
+│   ├── globals/            # Global variables
+│   ├── managers/           # Manage screens, inputs, game states etc..
+│   ├── scenes/             # Game scenes
+│   └── utils/              # Helper functions
 └── /bin                    # Build output
 ```
 

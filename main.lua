@@ -1,3 +1,4 @@
+local moonshine         = require("lib.moonshine")
 local sceneManager      = require("src.managers.scene_manager")
 local consts            = require("src.globals.consts")
 local res               = require("src.globals.res")
@@ -23,9 +24,9 @@ end
 
 --#endregion
 
--- Shared assets and configs
-local assets = {}
-local configs = {}
+local assets        = {} -- Shared assets
+local configs       = {} -- Game configs
+local scanlinesTime = 0  -- Scanlines delta time
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
@@ -50,9 +51,11 @@ function love.load()
     assets.clickSound:setVolume(0.5)
 
     -- === Load shaders ===
-    assets.waveShader = love.graphics.newShader(res.WAVE_SHADER)
-    assets.bloomShader = love.graphics.newShader(res.BLOOM_SHADER)
-    assets.glitchShader = love.graphics.newShader(res.GLITCH_SHADER)
+    assets.cmsShader = moonshine(moonshine.effects.chromasep)
+    assets.cmsShader.chromasep.radius = 2
+    assets.glowShader = moonshine(moonshine.effects.glow)
+    assets.sclShader = moonshine(moonshine.effects.scanlines)
+    assets.sclShader.scanlines.thickness = 0.1
 
     -- Load configs and start game
     configs = file.loadConfigs()
@@ -80,10 +83,16 @@ function love.mousepressed(x, y, btn)
 end
 
 function love.update(dt)
+    scanlinesTime = scanlinesTime + dt * 5
+    assets.sclShader.scanlines.phase = scanlinesTime
+
     sceneManager:update(dt)
     input:update()
 end
 
+-- Draw game screen with scanlines
 function love.draw()
-    sceneManager:draw()
+    assets.sclShader(function()
+        sceneManager:draw()
+    end)
 end

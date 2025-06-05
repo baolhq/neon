@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.3
+
+Just discovered moonshine, it's free real estate!
+
+- Add moonshine for game shaders
+- Refactor `accept` to be both `Space` and `Enter`
+- Fix player flipping animation to be mid-jump
+
 ## 0.0.2
 
 Some real juicy stuff here, check this out!

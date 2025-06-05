@@ -39,7 +39,7 @@ function player:update(dt)
         -- Animation timed out
         if self.flipTimer <= 0 then
             self.isFlipping = false
-            self.flipTimer = 1
+            self.flipTimer = FLIP_DURATION
             self.lane = self.lane == 1 and 2 or 1
         end
     else
@@ -78,8 +78,23 @@ function player:draw(tileset)
     love.graphics.setColor(colors.SLATE_800)
 
     local oX, oY = self.w / 2, self.h / 2
-    local rotation = self.lane == 1 and math.pi / 2 or -math.pi / 2
-    self.animation:draw(tileset, self.pos.x + oX, self.pos.y + oY, rotation, 3, 3, 8, 8)
+    local rotation, facingDir
+    if self.pos.x + oX > love.graphics.getWidth() / 2 then
+        rotation = -math.pi / 2
+        facingDir = 1
+    else
+        rotation = math.pi / 2
+        facingDir = -1
+    end
+
+    self.animation:draw(
+        tileset,
+        self.pos.x + oX,
+        self.pos.y + oY,
+        rotation,
+        3 * facingDir, 3,
+        8, 8
+    )
 end
 
 return player

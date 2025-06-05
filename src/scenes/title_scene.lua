@@ -40,9 +40,6 @@ function titleScene:load(assets, actions, configs)
     self.actions       = actions
     self.configs       = configs
 
-    self.time          = 0 -- Shader animation timer
-    self.canvas        = love.graphics.newCanvas()
-
     local spacingY     = 48
     buttons.start.x    = (love.graphics.getWidth() - buttons.start.width) / 2
     buttons.start.y    = (love.graphics.getHeight() - buttons.start.height) / 2 + 28
@@ -93,11 +90,6 @@ end
 function titleScene:update(dt)
     if input:wasPressed("back") then self.actions.quit() end
 
-    self.time = self.time + dt
-    self.assets.glitchShader:send("time", self.time)
-    local randStr = love.math.random(0.001, 0.3)
-    self.assets.glitchShader:send("glitch", randStr)
-
     if input:wasPressed("accept") then
         if buttons.start.active then
             self.assets.titleSound:stop()
@@ -122,24 +114,11 @@ function titleScene:update(dt)
 end
 
 function titleScene:draw()
-    love.graphics.clear(colors.SLATE_100)
     local font = file:getFont(res.MAIN_FONT, consts.FONT_TITLE_SIZE)
-
-    -- Draw title with glitch effect
-    -- love.graphics.setShader(self.assets.waveShader)
-    -- drawer.drawCenteredText(consts.GAME_TITLE, font, 0, -68)
-    -- love.graphics.setShader()
-
-    love.graphics.setCanvas(self.canvas)
-    love.graphics.clear()
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.setShader()
-    drawer.drawCenteredText(consts.GAME_TITLE, font, 0, -68)
-    love.graphics.setCanvas()
-
-    love.graphics.setShader(self.assets.glitchShader)
-    love.graphics.draw(self.canvas)
-    love.graphics.setShader()
+    self.assets.cmsShader(function()
+        love.graphics.clear(colors.SLATE_100)
+        drawer.drawCenteredText(consts.GAME_TITLE, font, 0, -68)
+    end)
 
     font = file:getFont(res.MAIN_FONT, consts.FONT_SUB_SIZE)
     for _, b in pairs(buttons) do

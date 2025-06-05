@@ -41,7 +41,7 @@ function mainScene:handleInputs()
         self.actions.switchScene("title")
     end
 
-    if input:wasPressed("space") then
+    if input:wasPressed("accept") and not self.isGameOver then
         self.isPaused = not self.isPaused
     end
 
