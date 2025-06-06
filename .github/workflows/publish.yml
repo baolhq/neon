@@ -27,7 +27,7 @@ jobs:
           pip3 install makelove
 
       - name: Build
-        run: makelove --config build_config.toml
+        run: makelove --config build.toml
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
