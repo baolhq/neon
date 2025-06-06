@@ -8,8 +8,8 @@ local drawer = {}
 function drawer.drawCenteredText(text, font, xOffset, yOffset)
     local textW = font:getWidth(text)
     local textH = font:getHeight(text)
-    local x = (consts.WINDOW_WIDTH - textW) / 2 + xOffset
-    local y = (consts.WINDOW_HEIGHT - textH) / 2 + yOffset
+    local x = (love.graphics.getWidth() - textW) / 2 + xOffset
+    local y = (love.graphics.getHeight() - textH) / 2 + yOffset
 
     love.graphics.print(text, x, y)
 end
@@ -44,7 +44,7 @@ end
 function drawer.drawOverlay(bgHeight, headerText, subTexts)
     love.graphics.setColor(colors.SLATE_800)
     local bgY = (love.graphics.getHeight() - bgHeight) / 2
-    love.graphics.rectangle("fill", 0, bgY, consts.WINDOW_WIDTH, bgHeight)
+    love.graphics.rectangle("fill", 0, bgY, love.graphics.getWidth(), bgHeight)
 
     local headerFont = file:getFont(res.MAIN_FONT, consts.FONT_HEADER_SIZE)
     love.graphics.setColor(colors.SLATE_100)

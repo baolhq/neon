@@ -2,7 +2,7 @@ local vector = require("lib.vector")
 local colors = require("src.globals.colors")
 local consts = require("src.globals.consts")
 
-local obstacle = {}
+local enemy = {}
 
 -- === Constants ===
 local POOL_SIZE = 20
@@ -14,28 +14,28 @@ local pool = {}
 
 -- === Pseudo Random ===
 local ptCasual = {
-    "lllrlrrrllrlrlllrrlr",
-    "rlrlrrrlrlllrrllrlrr",
-    "llrrllrlrrlllrrrlrlr",
-    "rrllrrrllrlrlrrlllrl",
-    "lrlrrllrlrrlllrlrrlr",
-    "rllrllrrrlrlrllrlrrl",
-    "llrlrlrrllrrrllrlrlr",
-    "rrlrrllrllrlrrllrlrl",
-    "lrrllrrrlllrllrrrlrl",
-    "rllrrllrlrrllrlrllrr",
+    "bbbtbtttbbtbtbbbttbt",
+    "tbtbtttbtbbbttbbtbtt",
+    "bbttbbtbttbbbtttbtbt",
+    "ttbbtttbbtbtbttbbbtb",
+    "btbttbbtbttbbbtbttbt",
+    "tbbtbbtttbtbtbbtbttb",
+    "bbtbtbttbbtttbbtbtbt",
+    "ttbttbbtbbtbttbbtbtb",
+    "bttbbtttbbbtbbtttbtb",
+    "tbbttbbtbttbbtbtbbtt",
 }
 local ptHard = {
-    "llllrrllrrrllllrrllr",
-    "rrrrllrrrllllrrllrlr",
-    "lllrrrllllrrrlllrrrl",
-    "rrrrrlllrllrrlllrrrl",
-    "lllrrllllrrrlrrrllrl",
-    "rrrrlllrrrlrrllllrrl",
-    "llrrrllllrrlllrrrllr",
-    "rrrlllrrrrllrrlllrrl",
-    "llllrrrlllrrrllllrrl",
-    "rrrllllrrrllllrrrllr",
+    "bbbbttbbtttbbbbttbbt",
+    "ttttbbtttbbbbttbbtbt",
+    "bbbtttbbbbtttbbbtttb",
+    "tttttbbbtbbttbbbtttb",
+    "bbbttbbbbtttbtttbbtb",
+    "ttttbbbtttbttbbbbttb",
+    "bbtttbbbbttbbbtttbbt",
+    "tttbbbttttbbttbbbttb",
+    "bbbbtttbbbtttbbbbttb",
+    "tttbbbbtttbbbbtttbbt",
 }
 
 ---Validate pattern length and randomness
@@ -57,30 +57,27 @@ local function validatePattern(p)
 end
 
 local function spawn(side, mode, anim)
-    local o = {
+    local e = {
         w = FRAME_W * SCALE,
         h = FRAME_H * SCALE,
         anim = anim
     }
 
     if mode == 1 then
-        o.speed = 200
+        e.speed = 200
     elseif mode == 2 then
-        o.speed = 300
+        e.speed = 300
     else
-        o.speed = 400
+        e.speed = 400
     end
 
-    local lX = consts.LANE_WIDTH
-    local rX = consts.WINDOW_WIDTH - consts.LANE_WIDTH - o.w
-    if side == "l" then
-        o.pos = vector(lX, -100)
-    else
-        o.pos = vector(rX, -100)
-    end
+    local topY = consts.GROUND_H
+    local botY = consts.WINDOW_H - consts.GROUND_H - e.h
+    e.pos = vector(love.graphics.getWidth() + 100, 0)
+    e.pos.y = side == "t" and topY or botY
 
-    setmetatable(o, { __index = obstacle })
-    return o
+    setmetatable(e, { __index = enemy })
+    return e
 end
 
 local function createPool(mode, anim)
@@ -104,38 +101,36 @@ local function createPool(mode, anim)
     validatePattern(pattern)
 end
 
-function obstacle.get(mode, anim)
+function enemy.get(mode, anim)
     if #pool == 0 then createPool(mode, anim) end
     return table.remove(pool)
 end
 
-function obstacle:update(dt)
-    self.pos.y = self.pos.y + self.speed * dt
+function enemy:update(dt)
+    self.pos.x = self.pos.x - self.speed * dt
     self.anim:update(dt)
 end
 
-function obstacle:draw(tileset)
+function enemy:draw(tileset)
     love.graphics.setColor(colors.SLATE_800)
 
     local oX, oY = self.w / 2, self.h / 2
-    local rotation, facingDir
-    if self.pos.x + oX > love.graphics.getWidth() / 2 then
-        rotation = -math.pi / 2
+    local facingDir
+    if self.pos.y + oY > consts.WINDOW_H / 2 then
         facingDir = 1
     else
-        rotation = math.pi / 2
         facingDir = -1
     end
     self.anim:draw(
         tileset,
+        self.pos.x + oX,
         -- Offset to fix visual
-        self.pos.x + oX - 9 * facingDir,
-        self.pos.y + oY,
-        rotation,
+        self.pos.y + oY - 1 * facingDir,
+        0,
         -- Scale up to match its collision box
-        SCALE * facingDir * 1.5, SCALE * 1.5,
+        SCALE * 1.5, SCALE * facingDir * 1.5,
         FRAME_W / 2, FRAME_H / 2
     )
 end
 
-return obstacle
+return enemy

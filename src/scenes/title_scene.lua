@@ -98,7 +98,7 @@ end
 function titleScene:update(dt)
     if input:wasPressed("back") then self.actions.quit() end
 
-    if input:wasPressed("accept") then
+    if input:wasPressed("accept") or input:wasPressed("jump") then
         if buttons.start.active then
             self.assets.titleSound:stop()
             self.actions.switchScene("main")

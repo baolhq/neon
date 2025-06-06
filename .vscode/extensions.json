@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "sumneko.lua",
+    "tomblind.local-lua-debugger-vscode",
+    "christian-kohler.path-intellisense",
+    "tamasfe.even-better-toml"
+  ]
+}

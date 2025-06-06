@@ -1,13 +1,34 @@
 {
-  // See https://go.microsoft.com/fwlink/?LinkId=733558
-  // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
+    {
+      "label": "Clean LÖVE",
+      "type": "shell",
+      "windows": {
+        "command": "if (Test-Path bin) { Remove-Item -Recurse -Force bin }",
+        "options": {
+          "shell": {
+            "executable": "powershell.exe",
+            "args": ["-Command"]
+          }
+        }
+      },
+      "linux": {
+        "command": "[ -d bin ] && rm -rf bin",
+        "options": {
+          "shell": {
+            "executable": "/bin/bash",
+            "args": ["-c"]
+          }
+        }
+      }
+    },
     {
       "label": "Build LÖVE",
       "type": "process",
       "command": "makelove",
-      "args": ["--config", "build_config.toml"],
+      "args": ["--config", "build.toml"],
+      "dependsOn": "Clean LÖVE",
       "group": {
         "kind": "build",
         "isDefault": true

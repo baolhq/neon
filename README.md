@@ -8,10 +8,9 @@ Made with LÖVE™.
 
 ## Player Manual
 
-1. Control: `A` or `Left` and `D` or `Right` to jump
-2. Mouse: `Left Button` to also jump.
-3. Menu: `Tab` or `Up` and `Down` to navigate menu
-4. Action: `Space` or `Enter` to pause/resume or restart, `Esc` to go back
+1. Control: `Space` or `Left Mouse Button` to jump
+2. Menu: `Tab` or `Up` and `Down` to navigate menu
+3. Action: `Space` or `Enter` to pause/resume or restart, `Esc` to go back
 
 ## Building
 

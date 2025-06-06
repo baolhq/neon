@@ -5,9 +5,10 @@ local input = {
         down   = { "down", "s" },
         left   = { "left", "a" },
         right  = { "right", "d" },
-        accept = { "return", "space" },
+        accept = { "return" },
         back   = { "escape" },
         tab    = { "tab" },
+        jump   = { "space" },
     },
     keysDown = {},     -- Currently held
     keysPressed = {},  -- Pressed this frame

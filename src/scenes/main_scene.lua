@@ -8,7 +8,7 @@ local file          = require("src.utils.file")
 local input         = require("src.utils.input")
 
 local player        = require("src.models.player")
-local obstacle      = require("src.models.obstacle")
+local enemy         = require("src.models.enemy")
 
 -- === Constants ===
 local OBS_THRESHOLD = 0.5
@@ -19,8 +19,8 @@ function mainScene:load(assets, actions, configs)
     self.assets                     = assets
     self.actions                    = actions
     self.configs                    = configs
-    self.obstacles                  = {}
-    self.obsTimer                   = 0
+    self.enemies                    = {}
+    self.eTimer                     = 0
     self.isPaused                   = false
     self.isGameOver                 = false
 
@@ -38,10 +38,10 @@ function mainScene:load(assets, actions, configs)
 end
 
 function mainScene:reload()
-    for i = #self.obstacles, 1, -1 do
-        table.remove(self.obstacles, i)
+    for i = #self.enemies, 1, -1 do
+        table.remove(self.enemies, i)
     end
-    self.obstacles = {}
+    self.enemies = {}
 
     self.isGameOver = false
     self.actions.switchScene("main")
@@ -52,21 +52,19 @@ function mainScene:handleInputs()
         self.actions.switchScene("title")
     end
 
-    if input:wasPressed("accept") and not self.isGameOver then
+    if not self.isGameOver and input:wasPressed("accept") then
         self.isPaused = not self.isPaused
     end
 
-    if input:wasPressed("accept") and self.isGameOver then
+    if self.isGameOver and
+        (input:wasPressed("accept") or input:wasPressed("jump"))
+    then
         self:reload()
     end
 
-    if input:wasPressed("right") and player.lane == 1 or
-        input:wasPressed("left") and player.lane == 2
-    then
+    if input:wasPressed("jump") then
         player:jumpStart()
-    end
-
-    if input:wasReleased("right") or input:wasReleased("left") then
+    elseif input:wasReleased("jump") then
         player:jumpEnd()
     end
 end
@@ -91,66 +89,65 @@ function mainScene:update(dt)
     self:handleInputs()
     if self.isPaused or self.isGameOver then return end
 
-    -- Spawn obstacles
-    self.obsTimer = self.obsTimer + dt
-    if self.obsTimer > OBS_THRESHOLD then
-        local m = tonumber(self.configs.mode)
-        local newObs = obstacle.get(m, self.enemyAnim)
-        table.insert(self.obstacles, newObs)
-        self.obsTimer = 0
+    -- Spawn enemies
+    self.eTimer = self.eTimer + dt
+    if self.eTimer > OBS_THRESHOLD then
+        local m = tonumber(self.configs.mode) or 1
+        local newObs = enemy.get(m, self.enemyAnim)
+        table.insert(self.enemies, newObs)
+        self.eTimer = 0
     end
 
-    -- Update obstacles
-    for _, o in ipairs(self.obstacles) do
+    -- Update enemies
+    for _, o in ipairs(self.enemies) do
         o:update(dt)
     end
 
     player:update(dt)
-    local wasHit = player:checkCollision(self.obstacles)
+    local wasHit = player:checkCollision(self.enemies)
     if wasHit then self.isGameOver = true end
 end
 
 function mainScene:draw()
     self.cmsShader(function()
         love.graphics.clear(colors.SLATE_100)
+        local w, h = love.graphics.getDimensions()
 
         -- === Draw lanes ===
         love.graphics.setColor(colors.SLATE_200)
-        love.graphics.rectangle("fill", 0, 0, consts.LANE_WIDTH, consts.WINDOW_HEIGHT)
-        local laneRightX = consts.WINDOW_WIDTH - consts.LANE_WIDTH
-        love.graphics.rectangle("fill", laneRightX, 0, consts.LANE_WIDTH, consts.WINDOW_HEIGHT)
+        love.graphics.rectangle("fill", 0, 0, w, consts.GROUND_H)
+        local groundBx = consts.WINDOW_H - consts.GROUND_H
+        love.graphics.rectangle("fill", 0, groundBx, w, consts.GROUND_H)
 
         -- === Draw center line ===
-        local centerX = love.graphics.getWidth() / 2
         love.graphics.setColor(colors.SLATE_200)
-        love.graphics.rectangle("line", centerX, 0, 1, consts.WINDOW_HEIGHT)
+        love.graphics.rectangle("line", 0, h / 2, w, 1)
 
         -- === Draw player ===
         player:draw(self.assets.tileset)
 
-        -- === Draw obstacles ===
-        for _, o in ipairs(self.obstacles) do
-            o:draw(self.assets.tileset)
+        -- === Draw enemies ===
+        for _, e in ipairs(self.enemies) do
+            e:draw(self.assets.tileset)
         end
 
         -- === Draw score ===
         local font = file:getFont(res.MAIN_FONT, consts.FONT_HEADER_SIZE)
-        local scoreY = -280
-        local scoreW, scoreH = 150, 80
-        local centerY = love.graphics.getHeight() / 2
+        local scoreText = "99"
+        local scoreW, scoreH = font:getWidth("99") + 16, font:getHeight()
 
         -- Draw score background
         love.graphics.setColor(colors.SLATE_100)
         love.graphics.rectangle(
             "fill",
-            centerX - scoreH,
-            centerY + scoreY - scoreH / 2,
+            w / 2 - scoreW / 2,
+            h / 2 - scoreH / 2,
             scoreW, scoreH
         )
 
         -- Draw score text
         love.graphics.setColor(colors.SLATE_200)
-        drawer.drawCenteredText("99", font, 0, scoreY)
+        drawer.drawCenteredText(scoreText, font, 0, 0)
 
         -- === Draw pause screen ===
         if self.isPaused then

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.5
+
+First major refactoring, lots of changes here
+
+- **Change to horizontal scrolling instead of vertical**
+- Rename `obstacle` to `enemy` to fit the sprite
+- Add recommended VSCode extensions
+- Update VSCode build for automatic clean
+- Update input keybindings
+- Use `love.graphics.getWidth()` to prepare for screen resizing
+
 ## 0.0.4
 
 Revamped jumping logics, add visual guide, and catching some bugs 🐛
