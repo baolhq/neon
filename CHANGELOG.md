@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.6
+
+Newton appear and says:
+
+- **Add gravity to the game**
+- Longer airtime while holding jump button
+- Add enemy dead animation
+- Add score saving system
+
 ## 0.0.5
 
 First major refactoring, lots of changes here
@@ -19,7 +28,7 @@ Revamped jumping logics, add visual guide, and catching some bugs 🐛
 - Add animated scene transition
 - Add pseudo random obstacle generator
 - Add enemy animation
-- Minor bugs catched
+- Minor bugs caught
 
 ## 0.0.3
 
@@ -44,7 +53,7 @@ Not so much going on, just bringin' some stuff from my old project over.
 
 - Add title, main and settings screen
 - Add screen manager for easier switching
-- Add cross-plarforms build support
+- Add cross-plarform build support
 - Add many utility functions
 - Add global constants for for easier management
 - Some placeholder audio and images that I'll change later

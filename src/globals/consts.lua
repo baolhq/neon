@@ -4,7 +4,7 @@ return {
     WINDOW_W = 800,
     WINDOW_H = 600,
     GROUND_H = 50,
-    FONT_TITLE_SIZE = 64,
+    FONT_TITLE_SIZE = 80,
     FONT_HEADER_SIZE = 48,
     FONT_SUB_SIZE = 16,
 }

@@ -1,19 +1,21 @@
-local vector = require("lib.vector")
-local colors = require("src.globals.colors")
-local consts = require("src.globals.consts")
+local anim8     = require("lib.anim8")
+local vector    = require("lib.vector")
+local colors    = require("src.globals.colors")
+local consts    = require("src.globals.consts")
 
-local enemy = {}
+local enemy     = {}
 
 -- === Constants ===
 local POOL_SIZE = 20
-local SCALE = 2
-local FRAME_W, FRAME_H = 16, 16
+local SCALE     = 2
+local FRAME_W   = 16
+local FRAME_H   = 16
 
 -- === Pooling ===
-local pool = {}
+local pool      = {}
 
 -- === Pseudo Random ===
-local ptCasual = {
+local ptCasual  = {
     "bbbtbtttbbtbtbbbttbt",
     "tbtbtttbtbbbttbbtbtt",
     "bbttbbtbttbbbtttbtbt",
@@ -25,7 +27,7 @@ local ptCasual = {
     "bttbbtttbbbtbbtttbtb",
     "tbbttbbtbttbbtbtbbtt",
 }
-local ptHard = {
+local ptHard    = {
     "bbbbttbbtttbbbbttbbt",
     "ttttbbtttbbbbttbbtbt",
     "bbbtttbbbbtttbbbtttb",
@@ -56,11 +58,13 @@ local function validatePattern(p)
     end
 end
 
-local function spawn(side, mode, anim)
+local function spawn(side, mode, anims)
     local e = {
         w = FRAME_W * SCALE,
         h = FRAME_H * SCALE,
-        anim = anim
+        dead = false,
+        baseAnim = anim8.newAnimation(anims("1-3", 2), 0.2),
+        deathAnim = anim8.newAnimation(anims("4-4", 2), 1),
     }
 
     if mode == 1 then
@@ -80,7 +84,7 @@ local function spawn(side, mode, anim)
     return e
 end
 
-local function createPool(mode, anim)
+local function createPool(mode, anims)
     local presets = {}
     if mode == 1 then
         presets = ptCasual
@@ -95,20 +99,20 @@ local function createPool(mode, anim)
     end
 
     for i = 1, POOL_SIZE do
-        table.insert(pool, spawn(pattern[i], mode, anim))
+        table.insert(pool, spawn(pattern[i], mode, anims))
     end
 
     validatePattern(pattern)
 end
 
-function enemy.get(mode, anim)
-    if #pool == 0 then createPool(mode, anim) end
+function enemy.get(mode, anims)
+    if #pool == 0 then createPool(mode, anims) end
     return table.remove(pool)
 end
 
 function enemy:update(dt)
     self.pos.x = self.pos.x - self.speed * dt
-    self.anim:update(dt)
+    self.baseAnim:update(dt)
 end
 
 function enemy:draw(tileset)
@@ -121,16 +125,30 @@ function enemy:draw(tileset)
     else
         facingDir = -1
     end
-    self.anim:draw(
-        tileset,
-        self.pos.x + oX,
-        -- Offset to fix visual
-        self.pos.y + oY - 1 * facingDir,
-        0,
-        -- Scale up to match its collision box
-        SCALE * 1.5, SCALE * facingDir * 1.5,
-        FRAME_W / 2, FRAME_H / 2
-    )
+
+    if self.dead then
+        self.deathAnim:draw(
+            tileset,
+            self.pos.x + oX,
+            -- Offset to fix visual
+            self.pos.y + oY - 1 * facingDir,
+            0,
+            -- Scale up to match its collision box
+            SCALE * 1.5, SCALE * facingDir * 1.5,
+            FRAME_W / 2, FRAME_H / 2
+        )
+    else
+        self.baseAnim:draw(
+            tileset,
+            self.pos.x + oX,
+            -- Offset to fix visual
+            self.pos.y + oY - 1 * facingDir,
+            0,
+            -- Scale up to match its collision box
+            SCALE * 1.5, SCALE * facingDir * 1.5,
+            FRAME_W / 2, FRAME_H / 2
+        )
+    end
 end
 
 return enemy

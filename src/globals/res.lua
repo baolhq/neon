@@ -15,4 +15,5 @@ return {
 
     -- File paths
     CONFIG_PATH = "neon.conf",
+    SAVE_PATH = "scores.txt",
 }

@@ -1,19 +1,19 @@
-local anim8         = require("lib.anim8")
-local moonshine     = require("lib.moonshine")
-local colors        = require("src.globals.colors")
-local consts        = require("src.globals.consts")
-local res           = require("src.globals.res")
-local drawer        = require("src.utils.drawer")
-local file          = require("src.utils.file")
-local input         = require("src.utils.input")
+local anim8           = require("lib.anim8")
+local moonshine       = require("lib.moonshine")
+local colors          = require("src.globals.colors")
+local consts          = require("src.globals.consts")
+local res             = require("src.globals.res")
+local drawer          = require("src.utils.drawer")
+local file            = require("src.utils.file")
+local input           = require("src.utils.input")
 
-local player        = require("src.models.player")
-local enemy         = require("src.models.enemy")
+local player          = require("src.models.player")
+local enemy           = require("src.models.enemy")
 
 -- === Constants ===
-local OBS_THRESHOLD = 0.5
+local ENEMY_THRESHOLD = 0.6
 
-local mainScene     = {}
+local mainScene       = {}
 
 function mainScene:load(assets, actions, configs)
     self.assets                     = assets
@@ -24,6 +24,11 @@ function mainScene:load(assets, actions, configs)
     self.isPaused                   = false
     self.isGameOver                 = false
 
+    -- === Scoring ===
+    self.score                      = 0
+    self.highScores                 = file.loadScores()
+    self.scoreSaved                 = false
+
     -- === Shaders ===
     self.cmsShader                  = moonshine(moonshine.effects.chromasep)
     self.cmsShader.chromasep.radius = 4
@@ -31,10 +36,9 @@ function mainScene:load(assets, actions, configs)
     -- === Animations ===
     local tileW                     = self.assets.tileset:getWidth()
     local tileH                     = self.assets.tileset:getHeight()
-    local grid                      = anim8.newGrid(16, 16, tileW, tileH)
-    local playerAnim                = anim8.newAnimation(grid("1-4", 1), 0.1)
-    self.enemyAnim                  = anim8.newAnimation(grid("1-3", 2), 0.2)
-    player:init(playerAnim)
+    self.anims                      = anim8.newGrid(16, 16, tileW, tileH)
+
+    player:init(self.anims)
 end
 
 function mainScene:reload()
@@ -44,6 +48,7 @@ function mainScene:reload()
     self.enemies = {}
 
     self.isGameOver = false
+    self.scoreSaved = false
     self.actions.switchScene("main")
 end
 
@@ -60,6 +65,7 @@ function mainScene:handleInputs()
         (input:wasPressed("accept") or input:wasPressed("jump"))
     then
         self:reload()
+        return
     end
 
     if input:wasPressed("jump") then
@@ -87,13 +93,27 @@ end
 
 function mainScene:update(dt)
     self:handleInputs()
+
+    if self.isGameOver and not self.scoreSaved then
+        table.insert(self.highScores, self.score)
+        table.sort(self.highScores, function(a, b)
+            return a > b
+        end)
+
+        while #self.highScores > 5 do
+            table.remove(self.highScores)
+        end
+        file.saveScores(self.highScores)
+        self.scoreSaved = true
+    end
+
     if self.isPaused or self.isGameOver then return end
 
     -- Spawn enemies
     self.eTimer = self.eTimer + dt
-    if self.eTimer > OBS_THRESHOLD then
+    if self.eTimer > ENEMY_THRESHOLD then
         local m = tonumber(self.configs.mode) or 1
-        local newObs = enemy.get(m, self.enemyAnim)
+        local newObs = enemy.get(m, self.anims)
         table.insert(self.enemies, newObs)
         self.eTimer = 0
     end
@@ -104,8 +124,17 @@ function mainScene:update(dt)
     end
 
     player:update(dt)
-    local wasHit = player:checkCollision(self.enemies)
-    if wasHit then self.isGameOver = true end
+    local collided = player:checkCollision(self.enemies)
+    if collided then
+        local isOnTop = player:checkOnTop(collided)
+        if not isOnTop then
+            self.isGameOver = true
+        else
+            player.velY = player.lane == 2 and player.impulse or -player.impulse
+            collided.dead = true
+            self.score = self.score + 1
+        end
+    end
 end
 
 function mainScene:draw()
@@ -133,8 +162,8 @@ function mainScene:draw()
 
         -- === Draw score ===
         local font = file:getFont(res.MAIN_FONT, consts.FONT_HEADER_SIZE)
-        local scoreText = "99"
-        local scoreW, scoreH = font:getWidth("99") + 16, font:getHeight()
+        local scoreText = string.format("%02d", self.score)
+        local scoreW, scoreH = font:getWidth(scoreText) + 16, font:getHeight()
 
         -- Draw score background
         love.graphics.setColor(colors.SLATE_100)
