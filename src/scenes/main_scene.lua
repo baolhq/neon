@@ -61,10 +61,8 @@ function mainScene:handleInputs()
         self.isPaused = not self.isPaused
     end
 
-    if self.isGameOver and
-        (input:wasPressed("accept") or input:wasPressed("jump"))
-    then
-        self:reload()
+    if self.isGameOver and (input:wasPressed("accept") or input:wasPressed("jump")) then
+        self.actions.switchScene("lboard")
         return
     end
 

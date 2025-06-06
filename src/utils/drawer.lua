@@ -57,4 +57,52 @@ function drawer.drawOverlay(bgHeight, headerText, subTexts)
     end
 end
 
+---Draw an interactive text box for user input
+---@param textbox table {x, y, width, height, text, active, maxLength}
+---@param font love.Font Font to use for text rendering
+function drawer.drawTextBox(textbox, font)
+    -- Draw background
+    love.graphics.setColor(colors.SLATE_400)
+    love.graphics.rectangle("fill", textbox.x, textbox.y, textbox.width, textbox.height, 4, 4)
+
+    -- Draw border (highlighted if active)
+    if textbox.active then
+        love.graphics.setColor(colors.SLATE_800)
+        love.graphics.setLineWidth(2)
+        love.graphics.rectangle("line", textbox.x, textbox.y, textbox.width, textbox.height, 4, 4)
+    end
+
+    -- Draw text
+    love.graphics.setColor(colors.WHITE)
+    love.graphics.setFont(font)
+    local displayText = textbox.text or ""
+    if displayText == "" then
+        displayText = "Enter Name"               -- Placeholder text
+        love.graphics.setColor(colors.SLATE_600) -- Dimmed for placeholder
+    end
+    local textW = font:getWidth(displayText)
+    local textH = font:getHeight()
+    love.graphics.print(
+        displayText,
+        textbox.x + 10, -- Padding
+        textbox.y + (textbox.height - textH) / 2
+    )
+
+    -- Draw blinking cursor when active
+    if textbox.active then
+        local cursorTime = love.timer.getTime() % 1
+        if cursorTime < 0.5 then
+            local cursorX = textbox.x + 10 + (textW > 0 and textW or font:getWidth("Enter Name"))
+            love.graphics.setColor(colors.SLATE_800)
+            love.graphics.rectangle(
+                "fill",
+                cursorX,
+                textbox.y + (textbox.height - textH) / 2,
+                2,
+                textH
+            )
+        end
+    end
+end
+
 return drawer
