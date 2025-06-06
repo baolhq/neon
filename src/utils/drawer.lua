@@ -75,8 +75,11 @@ function drawer.drawTextBox(textbox, font)
     end
 
     -- Draw text
-    love.graphics.setColor(colors.WHITE)
-    love.graphics.setColor(colors.SLATE_400) -- Dimmed for placeholder
+    if textbox.hovered or textbox.focused then
+        love.graphics.setColor(colors.WHITE)
+    else
+        love.graphics.setColor(colors.SLATE_400) -- Dimmed for placeholder
+    end
     love.graphics.setFont(font)
     local textW = font:getWidth(textbox.text)
     local textH = font:getHeight()

@@ -137,7 +137,7 @@ function titleScene:keypressed(key)
         return
     end
 
-    if key == "escape" or key == "tab" then
+    if key == "escape" or key == "tab" or key == "up" or key == "down" then
         -- Cancel input and revert to previous name
         nameInput.text = prevName
         nameInput.valid = true
@@ -168,12 +168,14 @@ end
 
 -- Updates button states based on mouse position
 function titleScene:mousemoved(x, y)
+    local btnHovered = false
     for i, name in ipairs(buttonOrder) do
         local btn = buttons[name]
         local isHovered =
             x > btn.x and x < btn.x + btn.w and
             y > btn.y and y < btn.y + btn.h
         btn.active = isHovered
+        if btn.active then btnHovered = true end
         if isHovered then focusedIndex = i end
     end
 
@@ -181,10 +183,21 @@ function titleScene:mousemoved(x, y)
     nameInput.hovered =
         x > nameInput.x and x < nameInput.x + nameInput.w and
         y > nameInput.y and y < nameInput.y + nameInput.h
+
+    if btnHovered then
+        local cursor = love.mouse.getSystemCursor("hand")
+        love.mouse.setCursor(cursor)
+    elseif nameInput.hovered then
+        local cursor = love.mouse.getSystemCursor("ibeam")
+        love.mouse.setCursor(cursor)
+    else
+        love.mouse.setCursor()
+    end
 end
 
 -- Handles mouse clicks on UI elements
 function titleScene:mousepressed(x, y, btn)
+    focusedIndex = 0
     for _, b in pairs(buttons) do
         b.active = false -- Reset all button states
     end
@@ -212,6 +225,7 @@ function titleScene:mousepressed(x, y, btn)
 
     if btn == 1 then
         if clickedElement == "start" then
+            love.mouse.setCursor()
             self.assets.titleSound:stop()
             self.actions.switchScene("main")
         elseif clickedElement == "lboard" then
@@ -274,7 +288,13 @@ function titleScene:handleInputs()
         -- Move focus to previous UI element
         for _, b in pairs(buttons) do b.active = false end
         nameInput.focused = false
-        focusedIndex = (focusedIndex - 2) % #focusOrder + 1
+
+        if focusedIndex == 0 then
+            focusedIndex = #focusOrder -- Go to nameInput (last element)
+        else
+            focusedIndex = (focusedIndex - 2) % #focusOrder + 1
+        end
+
         local focusedName = focusOrder[focusedIndex]
         if focusedName == "nameInput" then
             nameInput.focused = true

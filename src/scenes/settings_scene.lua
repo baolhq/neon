@@ -88,7 +88,7 @@ function settingsScene:handleInputs()
         self.actions.switchScene("title")
     end
 
-    if input:wasPressed("accept") then
+    if input:wasPressed("accept") or input:wasPressed("jump") then
         if buttons.music.active then
             updateMusicBtn(buttons.music, self.configs)
         elseif buttons.mode.active then
@@ -120,10 +120,19 @@ function settingsScene:handleInputs()
 end
 
 function settingsScene:mousemoved(x, y)
+    local btnHovered = false
     for _, b in pairs(buttons) do
         b.active =
             x > b.x and x < b.x + b.w and
             y > b.y and y < b.y + b.h
+        if b.active then btnHovered = true end
+    end
+
+    if btnHovered then
+        local cursor = love.mouse.getSystemCursor("hand")
+        love.mouse.setCursor(cursor)
+    else
+        love.mouse.setCursor()
     end
 end
 

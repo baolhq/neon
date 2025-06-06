@@ -48,6 +48,13 @@ function lboardScene:mousemoved(x, y)
     button.active =
         x > button.x and x < button.x + button.w and
         y > button.y and y < button.y + button.h
+
+    if button.active then
+        local cursor = love.mouse.getSystemCursor("hand")
+        love.mouse.setCursor(cursor)
+    else
+        love.mouse.setCursor()
+    end
 end
 
 function lboardScene:mousepressed(x, y, btn)
