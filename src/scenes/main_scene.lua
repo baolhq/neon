@@ -10,10 +10,10 @@ local input           = require("src.utils.input")
 local player          = require("src.models.player")
 local enemy           = require("src.models.enemy")
 
+local mainScene       = {}
+
 -- === Constants ===
 local ENEMY_THRESHOLD = 0.6
-
-local mainScene       = {}
 
 function mainScene:load(assets, actions, configs)
     self.assets                     = assets
@@ -25,7 +25,7 @@ function mainScene:load(assets, actions, configs)
     self.isGameOver                 = false
 
     -- === Scoring ===
-    self.score                      = 0
+    self.score                      = { name = configs.name, value = 0 }
     self.highScores                 = file.loadScores()
     self.scoreSaved                 = false
 
@@ -39,9 +39,10 @@ function mainScene:load(assets, actions, configs)
     self.anims                      = anim8.newGrid(16, 16, tileW, tileH)
 
     player:init(self.anims)
+    self.assets.bgSound:play()
 end
 
-function mainScene:reload()
+function mainScene:unload()
     for i = #self.enemies, 1, -1 do
         table.remove(self.enemies, i)
     end
@@ -49,11 +50,12 @@ function mainScene:reload()
 
     self.isGameOver = false
     self.scoreSaved = false
-    self.actions.switchScene("main")
+    self.assets.bgSound:stop()
 end
 
 function mainScene:handleInputs()
     if input:wasPressed("back") then
+        self.assets.bgSound:stop()
         self.actions.switchScene("title")
     end
 
@@ -62,8 +64,8 @@ function mainScene:handleInputs()
     end
 
     if self.isGameOver and (input:wasPressed("accept") or input:wasPressed("jump")) then
-        self.actions.switchScene("lboard")
-        return
+        self:unload()
+        self.actions.switchScene("main")
     end
 
     if input:wasPressed("jump") then
@@ -73,17 +75,18 @@ function mainScene:handleInputs()
     end
 end
 
-function mainScene:mousepressed(x, y, btn, isTouch, presses)
+function mainScene:mousepressed(x, y, btn)
     if btn == 1 then
         if self.isGameOver then
-            self:reload()
+            self:unload()
+            self.actions.switchScene("main")
         else
             player:jumpStart()
         end
     end
 end
 
-function mainScene:mousereleased(x, y, btn, isTouch, presses)
+function mainScene:mousereleased(x, y, btn)
     if btn == 1 then
         player:jumpEnd()
     end
@@ -95,7 +98,7 @@ function mainScene:update(dt)
     if self.isGameOver and not self.scoreSaved then
         table.insert(self.highScores, self.score)
         table.sort(self.highScores, function(a, b)
-            return a > b
+            return a.value > b.value
         end)
 
         while #self.highScores > 5 do
@@ -130,7 +133,7 @@ function mainScene:update(dt)
         else
             player.velY = player.lane == 2 and player.impulse or -player.impulse
             collided.dead = true
-            self.score = self.score + 1
+            self.score.value = self.score.value + 1
         end
     end
 end
@@ -159,8 +162,8 @@ function mainScene:draw()
         end
 
         -- === Draw score ===
-        local font = file:getFont(res.MAIN_FONT, consts.FONT_HEADER_SIZE)
-        local scoreText = string.format("%02d", self.score)
+        local font = file:getFont(res.MONO_FONT, consts.FONT_HEADER_SIZE)
+        local scoreText = string.format("%02d", self.score.value)
         local scoreW, scoreH = font:getWidth(scoreText) + 16, font:getHeight()
 
         -- Draw score background
@@ -186,7 +189,7 @@ function mainScene:draw()
         -- === Draw game over screen ===
         if self.isGameOver then
             drawer.drawOverlay(140, "GAME OVER", {
-                { text = "PRESS START", y = 0 },
+                { text = "CONTINUE?", y = 0 },
             })
         end
     end)

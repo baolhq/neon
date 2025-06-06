@@ -88,7 +88,8 @@ local function createPool(mode, anims)
     local presets = {}
     if mode == 1 then
         presets = ptCasual
-    elseif mode == 2 then
+    else
+        -- Use the same preset, only changes speed
         presets = ptHard
     end
 

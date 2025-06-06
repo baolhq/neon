@@ -12,6 +12,7 @@ return {
 
     -- Fonts
     MAIN_FONT = "res/fonts/Retro_Gaming.ttf",
+    MONO_FONT = "res/fonts/basis33.ttf",
 
     -- File paths
     CONFIG_PATH = "neon.conf",

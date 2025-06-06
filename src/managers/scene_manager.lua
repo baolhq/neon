@@ -42,21 +42,33 @@ function sceneManager:switch(name)
     self.tween = tween.new(0.4, self, { coverX = 0 }, "outQuad")
 end
 
-function sceneManager:mousemoved(x, y, dx, dy, isTouch)
+function sceneManager:keypressed(key)
+    if scenes[self.current].keypressed then
+        scenes[self.current]:keypressed(key)
+    end
+end
+
+function sceneManager:textinput(t)
+    if scenes[self.current].textinput then
+        scenes[self.current]:textinput(t)
+    end
+end
+
+function sceneManager:mousemoved(x, y)
     if scenes[self.current].mousemoved then
-        scenes[self.current]:mousemoved(x, y, dx, dy, isTouch)
+        scenes[self.current]:mousemoved(x, y)
     end
 end
 
-function sceneManager:mousepressed(x, y, btn, isTouch, presses)
+function sceneManager:mousepressed(x, y, btn)
     if scenes[self.current].mousepressed then
-        scenes[self.current]:mousepressed(x, y, btn, isTouch, presses)
+        scenes[self.current]:mousepressed(x, y, btn)
     end
 end
 
-function sceneManager:mousereleased(x, y, btn, isTouch, presses)
+function sceneManager:mousereleased(x, y, btn)
     if scenes[self.current].mousereleased then
-        scenes[self.current]:mousereleased(x, y, btn, isTouch, presses)
+        scenes[self.current]:mousereleased(x, y, btn)
     end
 end
 

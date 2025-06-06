@@ -20,7 +20,7 @@ function drawer.drawButton(btn, font)
         -- Active button effect
         love.graphics.setColor(colors.SLATE_800)
         love.graphics.setLineWidth(2)
-        love.graphics.rectangle("line", btn.x, btn.y, btn.width, btn.height, 4, 4)
+        love.graphics.rectangle("line", btn.x, btn.y, btn.w, btn.h, 4, 4)
 
         love.graphics.setColor(colors.SLATE_400)
     end
@@ -32,8 +32,8 @@ function drawer.drawButton(btn, font)
     local textH = font:getHeight(btn.text)
     love.graphics.print(
         btn.text,
-        btn.x + (btn.width - textW) / 2,
-        btn.y + (btn.height - textH) / 2
+        btn.x + (btn.w - textW) / 2,
+        btn.y + (btn.h - textH) / 2
     )
 end
 
@@ -58,48 +58,46 @@ function drawer.drawOverlay(bgHeight, headerText, subTexts)
 end
 
 ---Draw an interactive text box for user input
----@param textbox table {x, y, width, height, text, active, maxLength}
+---@param textbox table {x, y, w, h, text, hovered, focused, valid, maxLength}
 ---@param font love.Font Font to use for text rendering
 function drawer.drawTextBox(textbox, font)
     -- Draw background
-    love.graphics.setColor(colors.SLATE_400)
-    love.graphics.rectangle("fill", textbox.x, textbox.y, textbox.width, textbox.height, 4, 4)
+    love.graphics.setColor(colors.SLATE_200)
+    love.graphics.rectangle("fill", textbox.x, textbox.y, textbox.w, textbox.h, 4, 4)
 
-    -- Draw border (highlighted if active)
-    if textbox.active then
-        love.graphics.setColor(colors.SLATE_800)
+    -- Draw border (highlighted if hovered)
+    if textbox.hovered or textbox.focused then
+        -- Validation border
+        local color = textbox.valid and colors.SLATE_400 or colors.RED
+        love.graphics.setColor(color)
         love.graphics.setLineWidth(2)
-        love.graphics.rectangle("line", textbox.x, textbox.y, textbox.width, textbox.height, 4, 4)
+        love.graphics.rectangle("line", textbox.x, textbox.y, textbox.w, textbox.h, 4, 4)
     end
 
     -- Draw text
     love.graphics.setColor(colors.WHITE)
+    love.graphics.setColor(colors.SLATE_400) -- Dimmed for placeholder
     love.graphics.setFont(font)
-    local displayText = textbox.text or ""
-    if displayText == "" then
-        displayText = "Enter Name"               -- Placeholder text
-        love.graphics.setColor(colors.SLATE_600) -- Dimmed for placeholder
-    end
-    local textW = font:getWidth(displayText)
+    local textW = font:getWidth(textbox.text)
     local textH = font:getHeight()
     love.graphics.print(
-        displayText,
-        textbox.x + 10, -- Padding
-        textbox.y + (textbox.height - textH) / 2
+        textbox.text,
+        textbox.x + textbox.w / 2 - textW / 2, -- Centered text
+        textbox.y + textbox.h / 2 - textH / 2
     )
 
     -- Draw blinking cursor when active
-    if textbox.active then
+    if textbox.focused then
         local cursorTime = love.timer.getTime() % 1
         if cursorTime < 0.5 then
-            local cursorX = textbox.x + 10 + (textW > 0 and textW or font:getWidth("Enter Name"))
+            local cursorX = textbox.x + textbox.w / 2 - textW / 2 + textW + 2
             love.graphics.setColor(colors.SLATE_800)
             love.graphics.rectangle(
                 "fill",
                 cursorX,
-                textbox.y + (textbox.height - textH) / 2,
-                2,
-                textH
+                textbox.y + (textbox.h - textH) / 2 + 2,
+                4,
+                textH - 4
             )
         end
     end

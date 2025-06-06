@@ -47,13 +47,13 @@ end
 function file.saveScores(scores)
     -- Sort and keep top 5
     table.sort(scores, function(a, b)
-        return a > b
+        return a.value > b.value
     end)
 
     -- Build the list to save
     local lines = {}
     for i = 1, math.min(5, #scores) do
-        table.insert(lines, tostring(scores[i]))
+        table.insert(lines, scores[i].name .. "=" .. tostring(scores[i].value))
     end
 
     local content = table.concat(lines, "\n")
@@ -66,7 +66,10 @@ function file.loadScores()
 
     if love.filesystem.getInfo(res.SAVE_PATH) then
         for line in love.filesystem.lines(res.SAVE_PATH) do
-            table.insert(result, tonumber(line))
+            local name, score = line:match("([^=]+)=%s*(%d+)")
+            if name and score then
+                table.insert(result, { name = name, value = tonumber(score) })
+            end
         end
     end
 

@@ -9,6 +9,7 @@ local input = {
         back   = { "escape" },
         tab    = { "tab" },
         jump   = { "space" },
+        backsp = { "backspace" },
     },
     keysDown = {},     -- Currently held
     keysPressed = {},  -- Pressed this frame

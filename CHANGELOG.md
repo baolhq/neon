@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.7
+
+Lots of UI headache but it's work!
+
+- Implement leaderboard
+- Add input for player name
+- Major refactoring
+
 ## 0.0.6
 
 Newton appear and says:

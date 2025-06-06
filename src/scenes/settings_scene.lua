@@ -13,8 +13,8 @@ local buttons       = {
     music = {
         x = 0,
         y = 0,
-        width = 200,
-        height = 40,
+        w = 200,
+        h = 40,
         text = "MUSIC: ON",
         active = true,
         toggle = true,
@@ -23,8 +23,8 @@ local buttons       = {
     mode = {
         x = 0,
         y = 0,
-        width = 200,
-        height = 40,
+        w = 200,
+        h = 40,
         text = "MODE: NORMAL",
         options = { "NORMAL", "HARD", "INSANE" },
         index = 1,
@@ -33,8 +33,8 @@ local buttons       = {
     back = {
         x = 0,
         y = 0,
-        width = 200,
-        height = 40,
+        w = 200,
+        h = 40,
         text = "BACK",
         active = false,
     }
@@ -47,13 +47,13 @@ function settingsScene:load(assets, actions, configs)
 
     -- Draw buttons with spacings
     local spacingY    = 8
-    local totalHeight = #buttonOrder * buttons.music.height + (#buttonOrder - 1) * spacingY
+    local totalHeight = #buttonOrder * buttons.music.h + (#buttonOrder - 1) * spacingY
     local startY      = (love.graphics.getHeight() - totalHeight) / 2 + 88
 
     for i = 1, #buttonOrder do
         local button = buttons[buttonOrder[i]]
-        button.x = (love.graphics.getWidth() - button.width) / 2
-        button.y = startY + (i - 1) * (button.height + spacingY)
+        button.x = (love.graphics.getWidth() - button.w) / 2
+        button.y = startY + (i - 1) * (button.h + spacingY)
     end
 
     if configs.music then
@@ -96,6 +96,7 @@ function settingsScene:handleInputs()
         else
             self.actions.switchScene("title")
         end
+        self.assets.clickSound:play()
     end
 
     -- Cycling through button focuses
@@ -118,17 +119,15 @@ function settingsScene:handleInputs()
     end
 end
 
-function settingsScene:mousemoved(x, y, dx, dy, isTouch)
-    local mx, my = love.mouse:getPosition()
-
+function settingsScene:mousemoved(x, y)
     for _, b in pairs(buttons) do
         b.active =
-            mx > b.x and mx < b.x + b.width and
-            my > b.y and my < b.y + b.height
+            x > b.x and x < b.x + b.w and
+            y > b.y and y < b.y + b.h
     end
 end
 
-function settingsScene:mousepressed(x, y, btn, isTouch, presses)
+function settingsScene:mousepressed(x, y, btn)
     self.assets.clickSound:play()
     if btn ~= 1 then return end -- left click only
 
@@ -145,7 +144,7 @@ function settingsScene:mousepressed(x, y, btn, isTouch, presses)
     end
 end
 
-function settingsScene:update(dt)
+function settingsScene:update()
     self:handleInputs()
 end
 
@@ -153,7 +152,7 @@ function settingsScene:draw()
     love.graphics.clear(colors.SLATE_100)
 
     local font = file:getFont(res.MAIN_FONT, consts.FONT_HEADER_SIZE)
-    drawer.drawCenteredText("SETTINGS", font, 0, -68)
+    drawer.drawCenteredText("SETTINGS", font, 0, -120)
 
     font = file:getFont(res.MAIN_FONT, consts.FONT_SUB_SIZE)
     for _, btn in pairs(buttons) do

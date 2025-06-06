@@ -10,8 +10,8 @@ local lboardScene = {}
 local button      = {
     x = 0,
     y = 0,
-    width = 200,
-    height = 40,
+    w = 200,
+    h = 40,
     text = "BACK",
     active = true,
 }
@@ -22,8 +22,12 @@ function lboardScene:load(assets, actions, configs)
     self.configs    = configs
     self.highScores = file.loadScores()
 
-    button.x        = (love.graphics.getWidth() - button.width) / 2
-    button.y        = (love.graphics.getHeight() - button.height) / 2 + 180
+    button.x        = (love.graphics.getWidth() - button.w) / 2
+    button.y        = (love.graphics.getHeight() - button.h) / 2 + 170
+
+    if not self.assets.titleSound:isPlaying() then
+        self.assets.titleSound:play()
+    end
 end
 
 function lboardScene:handleInputs()
@@ -34,16 +38,19 @@ function lboardScene:handleInputs()
         self.assets.clickSound:play()
         self.actions.switchScene("title")
     end
+
+    if input:wasPressed("tab") then
+        button.active = true
+    end
 end
 
-function lboardScene:mousemoved(x, y, dx, dy, isTouch)
-    local mx, my = love.mouse.getPosition()
+function lboardScene:mousemoved(x, y)
     button.active =
-        mx > button.x and mx < button.x + button.width and
-        my > button.y and my < button.y + button.height
+        x > button.x and x < button.x + button.w and
+        y > button.y and y < button.y + button.h
 end
 
-function lboardScene:mousepressed(x, y, btn, isTouch, presses)
+function lboardScene:mousepressed(x, y, btn)
     if btn == 1 and button.active then
         self.assets.clickSound:play()
         self.actions.switchScene("title")
@@ -59,20 +66,43 @@ function lboardScene:draw()
 
     -- Draw title
     local headerFont = file:getFont(res.MAIN_FONT, consts.FONT_HEADER_SIZE)
-    drawer.drawCenteredText("LEADERBOARD", headerFont, 0, -68)
+    drawer.drawCenteredText("LEADERBOARD", headerFont, 0, -120)
 
-    -- Draw high scores
-    local subFont = file:getFont(res.MAIN_FONT, consts.FONT_SUB_SIZE)
-    local marginT = -28
-    local spacingY = 28
+    -- Precompute values
+    local centerX  = love.graphics.getWidth() / 2
+    local marginT  = -80
+    local spacingY = 35
+    local maxWidth = 450
+    local indexX   = centerX - maxWidth / 2 - 5
+    local monoFont = file:getFont(res.MONO_FONT, consts.FONT_MAIN_SIZE)
+    love.graphics.setFont(monoFont)
     love.graphics.setColor(colors.SLATE_800)
+
     for i = 1, 5 do
-        local score = self.highScores[i] or 0
-        local text = "?????? " .. string.rep(".", 80) .. string.format(" %04d", score)
-        drawer.drawCenteredText(text, subFont, 0, i * spacingY + marginT)
+        local entry      = self.highScores[i] or { name = string.rep("?", 10), value = 0 }
+        local index      = string.format("%d.", i)
+        local name       = entry.name
+        local score      = string.format("%04d", entry.value)
+
+        -- Positioning
+        local nameText   = name
+        local scoreText  = score
+        local scoreWidth = monoFont:getWidth(scoreText)
+        local lineY      = (love.graphics.getHeight() - monoFont:getHeight()) / 2
+            + i * spacingY + marginT
+
+        love.graphics.print(index, indexX, lineY)
+        love.graphics.print(nameText, centerX - maxWidth / 2 + 35, lineY)
+        love.graphics.print(scoreText, centerX + maxWidth / 2 - scoreWidth, lineY)
+
+        -- Draw horizontal line
+        love.graphics.setLineWidth(1)
+        lineY = lineY + monoFont:getHeight() - 4
+        love.graphics.line(indexX, lineY, centerX + maxWidth / 2, lineY)
     end
 
     -- Draw back button
+    local subFont = file:getFont(res.MAIN_FONT, consts.FONT_SUB_SIZE)
     drawer.drawButton(button, subFont)
 end
 

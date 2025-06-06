@@ -61,6 +61,7 @@ function love.load()
 end
 
 function love.keypressed(key)
+    sceneManager:keypressed(key)
     input:keypressed(key)
 end
 
@@ -68,20 +69,24 @@ function love.keyreleased(key)
     input:keyreleased(key)
 end
 
-function love.mousemoved(x, y, dx, dy, isTouch)
+function love.textinput(t)
+    sceneManager:textinput(t)
+end
+
+function love.mousemoved(x, y, dx, dy)
     -- Ignore small movements
     local min = 2
     if math.abs(dx) < min and math.abs(dy) < min then return end
 
-    sceneManager:mousemoved(x, y, dx, dy, isTouch)
+    sceneManager:mousemoved(x, y)
 end
 
-function love.mousepressed(x, y, btn, isTouch, presses)
-    sceneManager:mousepressed(x, y, btn, isTouch, presses)
+function love.mousepressed(x, y, btn)
+    sceneManager:mousepressed(x, y, btn)
 end
 
-function love.mousereleased(x, y, btn, isTouch, presses)
-    sceneManager:mousereleased(x, y, btn, isTouch, presses)
+function love.mousereleased(x, y, btn)
+    sceneManager:mousereleased(x, y, btn)
 end
 
 function love.update(dt)
