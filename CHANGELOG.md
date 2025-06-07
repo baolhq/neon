@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.0
+
+First major release 🥳
+
+- Finished basic game loop
+- Polished UI elements
+- Responsive controls
+- Remove unused stuff
+
 ## 0.0.7
 
 Lots of UI headache but it's work!
