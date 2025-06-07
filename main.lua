@@ -1,9 +1,14 @@
-local moonshine         = require("lib.moonshine")
-local sceneManager      = require("src.managers.scene_manager")
-local consts            = require("src.globals.consts")
-local res               = require("src.globals.res")
-local file              = require("src.utils.file")
-local input             = require("src.utils.input")
+local moonshine = require("lib.moonshine")
+local sceneManager = require("src.managers.scene_manager")
+local consts = require("src.globals.consts")
+local res = require("src.globals.res")
+local file = require("src.utils.file")
+local input = require("src.utils.input")
+
+-- === Abbreviations ===
+lg = love.graphics
+lf = love.filesystem
+lm = love.mouse
 
 --#region Debugger setup
 
@@ -24,19 +29,19 @@ end
 
 --#endregion
 
-local assets        = {} -- Shared assets
-local configs       = {} -- Game configs
-local scanlinesTime = 0  -- Scanlines delta time
+local assets = {}       -- Shared assets
+local configs = {}      -- Game configs
+local scanlinesTime = 0 -- Scanlines delta time
 
 function love.load()
-    love.graphics.setDefaultFilter("nearest", "nearest")
+    lg.setDefaultFilter("nearest", "nearest")
     -- Set game title and icon
     local gameIcon = love.image.newImageData(res.GAME_ICON)
     love.window.setIcon(gameIcon)
     love.window.setTitle(consts.GAME_TITLE)
 
     -- === Load sprites ===
-    assets.tileset = love.graphics.newImage(res.TILESET)
+    assets.tileset = lg.newImage(res.TILESET)
 
     -- === Load sounds ===
     assets.titleSound = love.audio.newSource(res.EDIT_SOUND, "stream")

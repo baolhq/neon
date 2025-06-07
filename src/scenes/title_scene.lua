@@ -1,23 +1,23 @@
-local utf8           = require("utf8")
-local moonshine      = require("lib.moonshine")
-local colors         = require("src.globals.colors")
-local consts         = require("src.globals.consts")
-local res            = require("src.globals.res")
-local drawer         = require("src.utils.drawer")
-local file           = require("src.utils.file")
-local input          = require("src.utils.input") -- Input handling for keyboard/gamepad
+local utf8 = require("utf8")
+local moonshine = require("lib.moonshine")
+local colors = require("src.globals.colors")
+local consts = require("src.globals.consts")
+local res = require("src.globals.res")
+local drawer = require("src.utils.drawer")
+local file = require("src.utils.file")
+local input = require("src.utils.input") -- Input handling for keyboard/gamepad
 
-local titleScene     = {}
+local titleScene = {}
 
 -- Ordered lists for UI navigation
-local buttonOrder    = { "start", "lboard", "settings" }
-local focusOrder     = { "start", "lboard", "settings", "nameInput" }
-local focusedIndex   = 1
+local buttonOrder = { "start", "lboard", "settings" }
+local focusOrder = { "start", "lboard", "settings", "nameInput" }
+local focusedIndex = 1
 local justFocusInput = false -- Prevents immediate action after input field loses focus
-local prevName       = ""    -- Store last valid player name
+local prevName = ""          -- Store last valid player name
 
 -- Button configurations for the main menu
-local buttons        = {
+local buttons = {
     start = {
         x = 0,
         y = 0,
@@ -45,7 +45,7 @@ local buttons        = {
 }
 
 -- Configuration for the player name input field
-local nameInput      = {
+local nameInput = {
     x = 0,
     y = 0,
     w = 200,
@@ -93,18 +93,18 @@ function titleScene:load(assets, actions, configs)
     file.saveConfigs(self.configs)
 
     -- Center the name input field horizontally and position near bottom
-    nameInput.x = (love.graphics.getWidth() - nameInput.w) / 2
-    nameInput.y = (love.graphics.getHeight() - nameInput.h) - 40
+    nameInput.x = (lg.getWidth() - nameInput.w) / 2
+    nameInput.y = (lg.getHeight() - nameInput.h) - 40
 
     -- Position buttons vertically with spacing
     local spacingY = 8
     local totalHeight = #buttonOrder * buttons.start.h + (#buttonOrder - 1) * spacingY
-    local startY = (love.graphics.getHeight() - totalHeight) / 2 + 88
+    local startY = (lg.getHeight() - totalHeight) / 2 + 88
 
     local anyActive = false -- Tracks if any button is active
     for i, name in ipairs(buttonOrder) do
         local button = buttons[name]
-        button.x = (love.graphics.getWidth() - button.w) / 2
+        button.x = (lg.getWidth() - button.w) / 2
         button.y = startY + (i - 1) * (button.h + spacingY)
         if button.active then anyActive = true end
     end
@@ -185,13 +185,13 @@ function titleScene:mousemoved(x, y)
         y > nameInput.y and y < nameInput.y + nameInput.h
 
     if btnHovered then
-        local cursor = love.mouse.getSystemCursor("hand")
-        love.mouse.setCursor(cursor)
+        local cursor = lm.getSystemCursor("hand")
+        lm.setCursor(cursor)
     elseif nameInput.hovered then
-        local cursor = love.mouse.getSystemCursor("ibeam")
-        love.mouse.setCursor(cursor)
+        local cursor = lm.getSystemCursor("ibeam")
+        lm.setCursor(cursor)
     else
-        love.mouse.setCursor()
+        lm.setCursor()
     end
 end
 
@@ -225,7 +225,7 @@ function titleScene:mousepressed(x, y, btn)
 
     if btn == 1 then
         if clickedElement == "start" then
-            love.mouse.setCursor()
+            lm.setCursor()
             self.assets.titleSound:stop()
             self.actions.switchScene("main")
         elseif clickedElement == "lboard" then
@@ -315,7 +315,7 @@ end
 function titleScene:draw()
     local font = file:getFont(res.MAIN_FONT, consts.FONT_TITLE_SIZE)
     self.cmsShader(function()
-        love.graphics.clear(colors.SLATE_100)
+        lg.clear(colors.SLATE_100)
         drawer.drawCenteredText(consts.GAME_TITLE, font, 0, -120)
     end)
 

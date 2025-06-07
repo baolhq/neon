@@ -1,42 +1,42 @@
-local anim8           = require("lib.anim8")
-local moonshine       = require("lib.moonshine")
-local colors          = require("src.globals.colors")
-local consts          = require("src.globals.consts")
-local res             = require("src.globals.res")
-local drawer          = require("src.utils.drawer")
-local file            = require("src.utils.file")
-local input           = require("src.utils.input")
+local anim8 = require("lib.anim8")
+local moonshine = require("lib.moonshine")
+local colors = require("src.globals.colors")
+local consts = require("src.globals.consts")
+local res = require("src.globals.res")
+local drawer = require("src.utils.drawer")
+local file = require("src.utils.file")
+local input = require("src.utils.input")
 
-local player          = require("src.models.player")
-local enemy           = require("src.models.enemy")
+local player = require("src.models.player")
+local enemy = require("src.models.enemy")
 
-local mainScene       = {}
+local mainScene = {}
 
 -- === Constants ===
 local ENEMY_THRESHOLD = 0.6
 
 function mainScene:load(assets, actions, configs)
-    self.assets                     = assets
-    self.actions                    = actions
-    self.configs                    = configs
-    self.enemies                    = {}
-    self.eTimer                     = 0
-    self.isPaused                   = false
-    self.isGameOver                 = false
+    self.assets = assets
+    self.actions = actions
+    self.configs = configs
+    self.enemies = {}
+    self.eTimer = 0
+    self.isPaused = false
+    self.isGameOver = false
 
     -- === Scoring ===
-    self.score                      = { name = configs.name, value = 0 }
-    self.highScores                 = file.loadScores()
-    self.scoreSaved                 = false
+    self.score = { name = configs.name, value = 0 }
+    self.highScores = file.loadScores()
+    self.scoreSaved = false
 
     -- === Shaders ===
-    self.cmsShader                  = moonshine(moonshine.effects.chromasep)
+    self.cmsShader = moonshine(moonshine.effects.chromasep)
     self.cmsShader.chromasep.radius = 4
 
     -- === Animations ===
-    local tileW                     = self.assets.tileset:getWidth()
-    local tileH                     = self.assets.tileset:getHeight()
-    self.anims                      = anim8.newGrid(16, 16, tileW, tileH)
+    local tileW = self.assets.tileset:getWidth()
+    local tileH = self.assets.tileset:getHeight()
+    self.anims = anim8.newGrid(16, 16, tileW, tileH)
 
     player:init(self.anims)
     self.assets.bgSound:play()
@@ -114,14 +114,14 @@ function mainScene:update(dt)
     self.eTimer = self.eTimer + dt
     if self.eTimer > ENEMY_THRESHOLD then
         local m = tonumber(self.configs.mode) or 1
-        local newObs = enemy.get(m, self.anims)
-        table.insert(self.enemies, newObs)
+        local e = enemy.get(m, self.anims)
+        table.insert(self.enemies, e)
         self.eTimer = 0
     end
 
     -- Update enemies
-    for _, o in ipairs(self.enemies) do
-        o:update(dt)
+    for _, e in ipairs(self.enemies) do
+        e:update(dt)
     end
 
     player:update(dt)
@@ -140,18 +140,18 @@ end
 
 function mainScene:draw()
     self.cmsShader(function()
-        love.graphics.clear(colors.SLATE_100)
-        local w, h = love.graphics.getDimensions()
+        lg.clear(colors.SLATE_100)
+        local w, h = lg.getDimensions()
 
         -- === Draw lanes ===
-        love.graphics.setColor(colors.SLATE_200)
-        love.graphics.rectangle("fill", 0, 0, w, consts.GROUND_H)
+        lg.setColor(colors.SLATE_200)
+        lg.rectangle("fill", 0, 0, w, consts.GROUND_H)
         local groundBx = consts.WINDOW_H - consts.GROUND_H
-        love.graphics.rectangle("fill", 0, groundBx, w, consts.GROUND_H)
+        lg.rectangle("fill", 0, groundBx, w, consts.GROUND_H)
 
         -- === Draw center line ===
-        love.graphics.setColor(colors.SLATE_200)
-        love.graphics.rectangle("line", 0, h / 2, w, 1)
+        lg.setColor(colors.SLATE_200)
+        lg.rectangle("line", 0, h / 2, w, 1)
 
         -- === Draw player ===
         player:draw(self.assets.tileset)
@@ -167,8 +167,8 @@ function mainScene:draw()
         local scoreW, scoreH = font:getWidth(scoreText) + 16, font:getHeight()
 
         -- Draw score background
-        love.graphics.setColor(colors.SLATE_100)
-        love.graphics.rectangle(
+        lg.setColor(colors.SLATE_100)
+        lg.rectangle(
             "fill",
             w / 2 - scoreW / 2,
             h / 2 - scoreH / 2,
@@ -176,7 +176,7 @@ function mainScene:draw()
         )
 
         -- Draw score text
-        love.graphics.setColor(colors.SLATE_200)
+        lg.setColor(colors.SLATE_200)
         drawer.drawCenteredText(scoreText, font, 0, 0)
 
         -- === Draw pause screen ===

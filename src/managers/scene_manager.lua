@@ -1,10 +1,10 @@
-local tween        = require("lib.tween")
-local colors       = require("src.globals.colors")
+local tween = require("lib.tween")
+local colors = require("src.globals.colors")
 
 local sceneManager = {}
 
 -- === Game scenes ===
-local scenes       = {
+local scenes = {
     title = require("src.scenes.title_scene"),
     main = require("src.scenes.main_scene"),
     lboard = require("src.scenes.lboard_scene"),
@@ -12,15 +12,15 @@ local scenes       = {
 }
 
 function sceneManager:load(assets, configs)
-    self.assets        = assets
-    self.configs       = configs
-    self.current       = "title"
-    self.next          = nil
+    self.assets = assets
+    self.configs = configs
+    self.current = "title"
+    self.next = nil
     self.transitioning = false
-    self.coverX        = nil -- For black rectangle
-    self.stage         = nil -- 'in' -> switch -> 'out'
-    self.tween         = nil
-    self.actions       = {
+    self.coverX = nil -- For black rectangle
+    self.stage = nil -- 'in' -> switch -> 'out'
+    self.tween = nil
+    self.actions = {
         switchScene = function(newScene)
             self:switch(newScene)
         end,
@@ -36,7 +36,7 @@ function sceneManager:switch(name)
 
     self.transitioning = true
     self.next = name
-    self.coverX = love.graphics.getWidth()
+    self.coverX = lg.getWidth()
     self.stage = "in"
 
     self.tween = tween.new(0.4, self, { coverX = 0 }, "outQuad")
@@ -84,7 +84,7 @@ function sceneManager:update(dt)
                 -- Start swipe out
                 self.stage = "out"
                 self.coverX = 0
-                self.tween = tween.new(0.4, self, { coverX = -love.graphics.getWidth() }, "inQuad")
+                self.tween = tween.new(0.4, self, { coverX = -lg.getWidth() }, "inQuad")
             else
                 -- Finished transition
                 self.transitioning = false
@@ -108,8 +108,8 @@ function sceneManager:draw()
 
     -- Draw the curtain if in transition
     if self.transitioning and self.coverX then
-        love.graphics.setColor(colors.SLATE_100)
-        love.graphics.rectangle("fill", self.coverX, 0, love.graphics.getWidth(), love.graphics.getHeight())
+        lg.setColor(colors.SLATE_100)
+        lg.rectangle("fill", self.coverX, 0, lg.getWidth(), lg.getHeight())
     end
 end
 

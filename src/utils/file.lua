@@ -9,10 +9,10 @@ function file:getFont(path, size)
 
     self.fontCache[path][size] =
         self.fontCache[path][size] or
-        love.graphics.newFont(path, size)
+        lg.newFont(path, size)
 
     local newFont = self.fontCache[path][size]
-    love.graphics.setFont(newFont)
+    lg.setFont(newFont)
 
     return newFont
 end
@@ -25,15 +25,15 @@ function file.saveConfigs(configs)
     end
 
     local content = table.concat(lines, "\n")
-    love.filesystem.write(res.CONFIG_PATH, content)
+    lf.write(res.CONFIG_PATH, content)
 end
 
 -- Load game configurations
 function file.loadConfigs()
     local configs = {}
 
-    if love.filesystem.getInfo(res.CONFIG_PATH) then
-        for line in love.filesystem.lines(res.CONFIG_PATH) do
+    if lf.getInfo(res.CONFIG_PATH) then
+        for line in lf.lines(res.CONFIG_PATH) do
             -- Split each config by the `=` sign
             local k, v = line:match("([^=]+)=([^=]+)")
             configs[k] = v
@@ -57,15 +57,15 @@ function file.saveScores(scores)
     end
 
     local content = table.concat(lines, "\n")
-    love.filesystem.write(res.SAVE_PATH, content)
+    lf.write(res.SAVE_PATH, content)
 end
 
 -- Load previous highscores
 function file.loadScores()
     local result = {}
 
-    if love.filesystem.getInfo(res.SAVE_PATH) then
-        for line in love.filesystem.lines(res.SAVE_PATH) do
+    if lf.getInfo(res.SAVE_PATH) then
+        for line in lf.lines(res.SAVE_PATH) do
             local name, score = line:match("([^=]+)=%s*(%d+)")
             if name and score then
                 table.insert(result, { name = name, value = tonumber(score) })

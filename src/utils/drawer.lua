@@ -1,36 +1,36 @@
 local colors = require("src.globals.colors")
 local consts = require("src.globals.consts")
-local res    = require("src.globals.res")
-local file   = require("src.utils.file")
+local res = require("src.globals.res")
+local file = require("src.utils.file")
 
 local drawer = {}
 
 function drawer.drawCenteredText(text, font, xOffset, yOffset)
     local textW = font:getWidth(text)
     local textH = font:getHeight(text)
-    local x = (love.graphics.getWidth() - textW) / 2 + xOffset
-    local y = (love.graphics.getHeight() - textH) / 2 + yOffset
+    local x = (lg.getWidth() - textW) / 2 + xOffset
+    local y = (lg.getHeight() - textH) / 2 + yOffset
 
-    love.graphics.print(text, x, y)
+    lg.print(text, x, y)
 end
 
 function drawer.drawButton(btn, font)
     -- Draw background
     if btn.active then
         -- Active button effect
-        love.graphics.setColor(colors.SLATE_800)
-        love.graphics.setLineWidth(2)
-        love.graphics.rectangle("line", btn.x, btn.y, btn.w, btn.h, 4, 4)
+        lg.setColor(colors.SLATE_800)
+        lg.setLineWidth(2)
+        lg.rectangle("line", btn.x, btn.y, btn.w, btn.h, 4, 4)
 
-        love.graphics.setColor(colors.SLATE_400)
+        lg.setColor(colors.SLATE_400)
     end
 
     -- Button text
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.setFont(font)
+    lg.setColor(1, 1, 1)
+    lg.setFont(font)
     local textW = font:getWidth(btn.text)
     local textH = font:getHeight(btn.text)
-    love.graphics.print(
+    lg.print(
         btn.text,
         btn.x + (btn.w - textW) / 2,
         btn.y + (btn.h - textH) / 2
@@ -42,16 +42,16 @@ end
 ---@param headerText string
 ---@param subTexts table
 function drawer.drawOverlay(bgHeight, headerText, subTexts)
-    love.graphics.setColor(colors.SLATE_800)
-    local bgY = (love.graphics.getHeight() - bgHeight) / 2
-    love.graphics.rectangle("fill", 0, bgY, love.graphics.getWidth(), bgHeight)
+    lg.setColor(colors.SLATE_800)
+    local bgY = (lg.getHeight() - bgHeight) / 2
+    lg.rectangle("fill", 0, bgY, lg.getWidth(), bgHeight)
 
     local headerFont = file:getFont(res.MAIN_FONT, consts.FONT_HEADER_SIZE)
-    love.graphics.setColor(colors.SLATE_100)
+    lg.setColor(colors.SLATE_100)
     drawer.drawCenteredText(headerText, headerFont, 0, subTexts[1].y - 18)
 
     local subFont = file:getFont(res.MAIN_FONT, consts.FONT_SUB_SIZE)
-    love.graphics.setColor(colors.SLATE_300)
+    lg.setColor(colors.SLATE_300)
     for i, textInfo in ipairs(subTexts) do
         drawer.drawCenteredText(textInfo.text, subFont, 0, textInfo.y + 18 * i)
     end
@@ -62,28 +62,28 @@ end
 ---@param font love.Font Font to use for text rendering
 function drawer.drawTextBox(textbox, font)
     -- Draw background
-    love.graphics.setColor(colors.SLATE_200)
-    love.graphics.rectangle("fill", textbox.x, textbox.y, textbox.w, textbox.h, 4, 4)
+    lg.setColor(colors.SLATE_200)
+    lg.rectangle("fill", textbox.x, textbox.y, textbox.w, textbox.h, 4, 4)
 
     -- Draw border (highlighted if hovered)
     if textbox.hovered or textbox.focused then
         -- Validation border
         local color = textbox.valid and colors.SLATE_400 or colors.RED
-        love.graphics.setColor(color)
-        love.graphics.setLineWidth(2)
-        love.graphics.rectangle("line", textbox.x, textbox.y, textbox.w, textbox.h, 4, 4)
+        lg.setColor(color)
+        lg.setLineWidth(2)
+        lg.rectangle("line", textbox.x, textbox.y, textbox.w, textbox.h, 4, 4)
     end
 
     -- Draw text
     if textbox.hovered or textbox.focused then
-        love.graphics.setColor(colors.WHITE)
+        lg.setColor(colors.WHITE)
     else
-        love.graphics.setColor(colors.SLATE_400) -- Dimmed for placeholder
+        lg.setColor(colors.SLATE_400) -- Dimmed for placeholder
     end
-    love.graphics.setFont(font)
+    lg.setFont(font)
     local textW = font:getWidth(textbox.text)
     local textH = font:getHeight()
-    love.graphics.print(
+    lg.print(
         textbox.text,
         textbox.x + textbox.w / 2 - textW / 2, -- Centered text
         textbox.y + textbox.h / 2 - textH / 2
@@ -94,8 +94,8 @@ function drawer.drawTextBox(textbox, font)
         local cursorTime = love.timer.getTime() % 1
         if cursorTime < 0.5 then
             local cursorX = textbox.x + textbox.w / 2 - textW / 2 + textW + 2
-            love.graphics.setColor(colors.SLATE_800)
-            love.graphics.rectangle(
+            lg.setColor(colors.SLATE_800)
+            lg.rectangle(
                 "fill",
                 cursorX,
                 textbox.y + (textbox.h - textH) / 2 + 2,

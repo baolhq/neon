@@ -1,21 +1,21 @@
-local anim8     = require("lib.anim8")
-local vector    = require("lib.vector")
-local colors    = require("src.globals.colors")
-local consts    = require("src.globals.consts")
+local anim8 = require("lib.anim8")
+local vector = require("lib.vector")
+local colors = require("src.globals.colors")
+local consts = require("src.globals.consts")
 
-local enemy     = {}
+local enemy = {}
 
 -- === Constants ===
 local POOL_SIZE = 20
-local SCALE     = 2
-local FRAME_W   = 16
-local FRAME_H   = 16
+local SCALE = 2
+local FRAME_W = 16
+local FRAME_H = 16
 
 -- === Pooling ===
-local pool      = {}
+local pool = {}
 
 -- === Pseudo Random ===
-local ptCasual  = {
+local ptCasual = {
     "bbbtbtttbbtbtbbbttbt",
     "tbtbtttbtbbbttbbtbtt",
     "bbttbbtbttbbbtttbtbt",
@@ -27,7 +27,7 @@ local ptCasual  = {
     "bttbbtttbbbtbbtttbtb",
     "tbbttbbtbttbbtbtbbtt",
 }
-local ptHard    = {
+local ptHard = {
     "bbbbttbbtttbbbbttbbt",
     "ttttbbtttbbbbttbbtbt",
     "bbbtttbbbbtttbbbtttb",
@@ -77,7 +77,7 @@ local function spawn(side, mode, anims)
 
     local topY = consts.GROUND_H
     local botY = consts.WINDOW_H - consts.GROUND_H - e.h
-    e.pos = vector(love.graphics.getWidth() + 100, 0)
+    e.pos = vector(lg.getWidth() + 100, 0)
     e.pos.y = side == "t" and topY or botY
 
     setmetatable(e, { __index = enemy })
@@ -117,7 +117,7 @@ function enemy:update(dt)
 end
 
 function enemy:draw(tileset)
-    love.graphics.setColor(colors.SLATE_800)
+    lg.setColor(colors.SLATE_800)
 
     local oX, oY = self.w / 2, self.h / 2
     local facingDir

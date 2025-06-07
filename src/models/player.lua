@@ -1,26 +1,26 @@
-local anim8       = require("lib.anim8")
-local vector      = require("lib.vector")
-local colors      = require("src.globals.colors")
-local consts      = require("src.globals.consts")
-local collider    = require("src.utils.collider")
+local anim8 = require("lib.anim8")
+local vector = require("lib.vector")
+local colors = require("src.globals.colors")
+local consts = require("src.globals.consts")
+local collider = require("src.utils.collider")
 
 -- === Constants ===
-local GRAVITY     = 1200
+local GRAVITY = 1200
 local STR_GRAVITY = 3600 -- Stronger gravity if not holding jump
 
-local player      = {}
+local player = {}
 
 function player:init(anims)
-    self.anim        = anim8.newAnimation(anims("1-4", 1), 0.1)
-    self.w, self.h   = 48, 48
-    self.lane        = 2 -- 1=top, 2=bottom
-    self.maxJumps    = 2
-    self.jumpsLeft   = self.maxJumps
+    self.anim = anim8.newAnimation(anims("1-4", 1), 0.1)
+    self.w, self.h = 48, 48
+    self.lane = 2 -- 1=top, 2=bottom
+    self.maxJumps = 2
+    self.jumpsLeft = self.maxJumps
     self.holdingJump = false
-    self.velY        = 0    -- Current Y-axis velocity
-    self.prevY       = 0    -- Store preivous Y-axis location
-    self.impulse     = -650 -- How high the jump
-    self.pos         = vector(
+    self.velY = 0       -- Current Y-axis velocity
+    self.prevY = 0      -- Store preivous Y-axis location
+    self.impulse = -650 -- How high the jump
+    self.pos = vector(
         consts.WINDOW_W * 0.2,
         consts.WINDOW_H - consts.GROUND_H - self.w
     )
@@ -84,9 +84,8 @@ end
 
 -- Check if the player is landing on top of an enemy's head
 function player:checkOnTop(enemy)
-    local gravityDir = self.lane == 1 and -1 or 1
-
     -- Player bottom or top depending on gravity
+    local gravityDir = self.lane == 1 and -1 or 1
     local pEdge = self.lane == 1 and self.pos.y or (self.pos.y + self.h)
     local pPrevEdge = self.lane == 1 and self.prevY or (self.prevY + self.h)
     local eEdge = self.lane == 1 and (enemy.pos.y + enemy.h) or enemy.pos.y
@@ -118,7 +117,7 @@ function player:checkCollision(enemies)
 end
 
 function player:draw(tileset)
-    love.graphics.setColor(colors.SLATE_800)
+    lg.setColor(colors.SLATE_800)
 
     local oX, oY = self.w / 2, self.h / 2
     local facingDir

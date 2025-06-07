@@ -1,14 +1,14 @@
 local input = {
     -- Action to keys mappings
     bindings = {
-        up     = { "up", "w" },
-        down   = { "down", "s" },
-        left   = { "left", "a" },
-        right  = { "right", "d" },
+        up = { "up", "w" },
+        down = { "down", "s" },
+        left = { "left", "a" },
+        right = { "right", "d" },
         accept = { "return" },
-        back   = { "escape" },
-        tab    = { "tab" },
-        jump   = { "space" },
+        back = { "escape" },
+        tab = { "tab" },
+        jump = { "space" },
         backsp = { "backspace" },
     },
     keysDown = {},     -- Currently held

@@ -1,15 +1,15 @@
-local colors        = require("src.globals.colors")
-local consts        = require("src.globals.consts")
-local res           = require("src.globals.res")
-local drawer        = require("src.utils.drawer")
-local file          = require("src.utils.file")
-local input         = require("src.utils.input")
+local colors = require("src.globals.colors")
+local consts = require("src.globals.consts")
+local res = require("src.globals.res")
+local drawer = require("src.utils.drawer")
+local file = require("src.utils.file")
+local input = require("src.utils.input")
 
 local settingsScene = {}
 
-local focusedIndex  = 1
-local buttonOrder   = { "music", "mode", "back" }
-local buttons       = {
+local focusedIndex = 1
+local buttonOrder = { "music", "mode", "back" }
+local buttons = {
     music = {
         x = 0,
         y = 0,
@@ -41,18 +41,18 @@ local buttons       = {
 }
 
 function settingsScene:load(assets, actions, configs)
-    self.assets       = assets
-    self.actions      = actions
-    self.configs      = configs
+    self.assets = assets
+    self.actions = actions
+    self.configs = configs
 
     -- Draw buttons with spacings
-    local spacingY    = 8
+    local spacingY = 8
     local totalHeight = #buttonOrder * buttons.music.h + (#buttonOrder - 1) * spacingY
-    local startY      = (love.graphics.getHeight() - totalHeight) / 2 + 88
+    local startY = (lg.getHeight() - totalHeight) / 2 + 88
 
     for i = 1, #buttonOrder do
         local button = buttons[buttonOrder[i]]
-        button.x = (love.graphics.getWidth() - button.w) / 2
+        button.x = (lg.getWidth() - button.w) / 2
         button.y = startY + (i - 1) * (button.h + spacingY)
     end
 
@@ -129,10 +129,10 @@ function settingsScene:mousemoved(x, y)
     end
 
     if btnHovered then
-        local cursor = love.mouse.getSystemCursor("hand")
-        love.mouse.setCursor(cursor)
+        local cursor = lm.getSystemCursor("hand")
+        lm.setCursor(cursor)
     else
-        love.mouse.setCursor()
+        lm.setCursor()
     end
 end
 
@@ -158,7 +158,7 @@ function settingsScene:update()
 end
 
 function settingsScene:draw()
-    love.graphics.clear(colors.SLATE_100)
+    lg.clear(colors.SLATE_100)
 
     local font = file:getFont(res.MAIN_FONT, consts.FONT_HEADER_SIZE)
     drawer.drawCenteredText("SETTINGS", font, 0, -120)
