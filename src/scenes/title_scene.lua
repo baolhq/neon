@@ -5,7 +5,7 @@ local consts = require("src.globals.consts")
 local res = require("src.globals.res")
 local drawer = require("src.utils.drawer")
 local file = require("src.utils.file")
-local input = require("src.utils.input") -- Input handling for keyboard/gamepad
+local input = require("src.utils.input")
 
 local titleScene = {}
 

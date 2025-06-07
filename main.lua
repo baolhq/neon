@@ -5,11 +5,6 @@ local res = require("src.globals.res")
 local file = require("src.utils.file")
 local input = require("src.utils.input")
 
--- === Abbreviations ===
-lg = love.graphics
-lf = love.filesystem
-lm = love.mouse
-
 --#region Debugger setup
 
 local love_errorhandler = love.errorhandler
@@ -28,6 +23,11 @@ function love.errorhandler(msg)
 end
 
 --#endregion
+
+-- === Abbreviations ===
+lg = love.graphics
+lf = love.filesystem
+lm = love.mouse
 
 local assets = {}       -- Shared assets
 local configs = {}      -- Game configs

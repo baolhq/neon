@@ -146,7 +146,7 @@ function mainScene:draw()
         -- === Draw lanes ===
         lg.setColor(colors.SLATE_200)
         lg.rectangle("fill", 0, 0, w, consts.GROUND_H)
-        local groundBx = consts.WINDOW_H - consts.GROUND_H
+        local groundBx = lg.getHeight() - consts.GROUND_H
         lg.rectangle("fill", 0, groundBx, w, consts.GROUND_H)
 
         -- === Draw center line ===

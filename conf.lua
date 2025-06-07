@@ -4,5 +4,4 @@ local consts = require("src.globals.consts")
 function love.conf(t)
     t.window.width = consts.WINDOW_W
     t.window.height = consts.WINDOW_H
-    t.window.msaa = 4
 end
