@@ -1,5 +1,4 @@
 local utf8 = require("utf8")
-local moonshine = require("lib.moonshine")
 local colors = require("src.globals.colors")
 local consts = require("src.globals.consts")
 local res = require("src.globals.res")
@@ -77,10 +76,6 @@ function titleScene:load(assets, actions, configs)
     self.assets = assets
     self.actions = actions
     self.configs = configs
-
-    self.cmsShader = moonshine(moonshine.effects.chromasep)
-    self.cmsShader.chromasep.angle = -math.pi / 4
-    self.cmsShader.chromasep.radius = 4
 
     -- Ensures a valid default name is set and persisted
     nameInput.text = self.configs.name or "PLAYER1"
@@ -314,10 +309,8 @@ end
 -- Draws the title screen
 function titleScene:draw()
     local font = file:getFont(res.MAIN_FONT, consts.FONT_TITLE_SIZE)
-    self.cmsShader(function()
-        lg.clear(colors.SLATE_100)
-        drawer.drawCenteredText(consts.GAME_TITLE, font, 0, -120)
-    end)
+    lg.clear(colors.SLATE_100)
+    drawer.drawCenteredText(consts.GAME_TITLE, font, 0, -120)
 
     -- Draw name input field and buttons
     font = file:getFont(res.MAIN_FONT, consts.FONT_SUB_SIZE)

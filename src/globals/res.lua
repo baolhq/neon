@@ -5,6 +5,9 @@ return {
     TILESET = "res/img/tileset.png",
     PARTICLE = "res/img/rectangle.png",
 
+    -- Shaders
+    SD_SCANLINE = "res/shaders/scanline.glsl",
+
     -- Sounds
     EDIT_SOUND = "res/audio/edit_theme.mp3",
     MAIN_SOUND = "res/audio/main_theme.mp3",

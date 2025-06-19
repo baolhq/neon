@@ -1,5 +1,4 @@
 local anim8 = require("lib.anim8")
-local moonshine = require("lib.moonshine")
 local colors = require("src.globals.colors")
 local consts = require("src.globals.consts")
 local res = require("src.globals.res")
@@ -28,10 +27,6 @@ function mainScene:load(assets, actions, configs)
     self.score = { name = configs.name, value = 0 }
     self.highScores = file.loadScores()
     self.scoreSaved = false
-
-    -- === Shaders ===
-    self.cmsShader = moonshine(moonshine.effects.chromasep)
-    self.cmsShader.chromasep.radius = 4
 
     -- === Animations ===
     local tileW = self.assets.tileset:getWidth()
@@ -139,60 +134,58 @@ function mainScene:update(dt)
 end
 
 function mainScene:draw()
-    self.cmsShader(function()
-        lg.clear(colors.SLATE_100)
-        local w, h = lg.getDimensions()
+    lg.clear(colors.SLATE_100)
+    local w, h = lg.getDimensions()
 
-        -- === Draw lanes ===
-        lg.setColor(colors.SLATE_200)
-        lg.rectangle("fill", 0, 0, w, consts.GROUND_H)
-        local groundBx = lg.getHeight() - consts.GROUND_H
-        lg.rectangle("fill", 0, groundBx, w, consts.GROUND_H)
+    -- === Draw lanes ===
+    lg.setColor(colors.SLATE_200)
+    lg.rectangle("fill", 0, 0, w, consts.GROUND_H)
+    local groundBx = lg.getHeight() - consts.GROUND_H
+    lg.rectangle("fill", 0, groundBx, w, consts.GROUND_H)
 
-        -- === Draw center line ===
-        lg.setColor(colors.SLATE_200)
-        lg.rectangle("line", 0, h / 2, w, 1)
+    -- === Draw center line ===
+    lg.setColor(colors.SLATE_200)
+    lg.rectangle("line", 0, h / 2, w, 1)
 
-        -- === Draw player ===
-        player:draw(self.assets.tileset)
+    -- === Draw player ===
+    player:draw(self.assets.tileset)
 
-        -- === Draw enemies ===
-        for _, e in ipairs(self.enemies) do
-            e:draw(self.assets.tileset)
-        end
+    -- === Draw enemies ===
+    for _, e in ipairs(self.enemies) do
+        e:draw(self.assets.tileset)
+    end
 
-        -- === Draw score ===
-        local font = file:getFont(res.MONO_FONT, consts.FONT_HEADER_SIZE)
-        local scoreText = string.format("%02d", self.score.value)
-        local scoreW, scoreH = font:getWidth(scoreText) + 16, font:getHeight()
+    -- === Draw score ===
+    local font = file:getFont(res.MONO_FONT, consts.FONT_HEADER_SIZE)
+    local scoreText = string.format("%02d", self.score.value)
+    local scoreW, scoreH = font:getWidth(scoreText) + 16, font:getHeight()
 
-        -- Draw score background
-        lg.setColor(colors.SLATE_100)
-        lg.rectangle(
-            "fill",
-            w / 2 - scoreW / 2,
-            h / 2 - scoreH / 2,
-            scoreW, scoreH
-        )
+    -- Draw score background
+    lg.setColor(colors.SLATE_100)
+    lg.rectangle(
+        "fill",
+        w / 2 - scoreW / 2,
+        h / 2 - scoreH / 2,
+        scoreW, scoreH
+    )
 
-        -- Draw score text
-        lg.setColor(colors.SLATE_200)
-        drawer.drawCenteredText(scoreText, font, 0, 0)
+    -- Draw score text
+    lg.setColor(colors.SLATE_200)
+    drawer.drawCenteredText(scoreText, font, 0, 0)
 
-        -- === Draw pause screen ===
-        if self.isPaused then
-            drawer.drawOverlay(140, "PAUSED", {
-                { text = "PRESS START", y = 0 },
-            })
-        end
+    -- === Draw pause screen ===
+    if self.isPaused then
+        drawer.drawOverlay(140, "PAUSED", {
+            { text = "PRESS START", y = 0 },
+        })
+    end
 
-        -- === Draw game over screen ===
-        if self.isGameOver then
-            drawer.drawOverlay(140, "GAME OVER", {
-                { text = "CONTINUE?", y = 0 },
-            })
-        end
-    end)
+    -- === Draw game over screen ===
+    if self.isGameOver then
+        drawer.drawOverlay(140, "GAME OVER", {
+            { text = "CONTINUE?", y = 0 },
+        })
+    end
 end
 
 return mainScene

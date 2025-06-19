@@ -2,7 +2,7 @@
 
 In NEÖN, you’re a lone runner hurtling through a glowing tunnel of chaos. Your mission? Survive the surge, collect energy orbs, and dodge deadly obstacles by jumping left or right at hyperspeed.
 
-Powered by [moonshine](https://github.com/vrld/moonshine) shaders, the world of NEÖN pulses with life — bloom, blur, and distortion effects react to your every move. Crank up your reflexes and ride the light.
+Powered by shaders, the world of NEÖN pulses with life — bloom, blur, and distortion effects react to your every move. Crank up your reflexes and ride the light.
 
 Made with LÖVE™.
 

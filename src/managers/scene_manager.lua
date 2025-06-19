@@ -1,10 +1,14 @@
-local tween = require("lib.tween")
-local colors = require("src.globals.colors")
+local tween         = require("lib.tween")
+local colors        = require("src.globals.colors")
+local res           = require("src.globals.res")
 
-local sceneManager = {}
+local sceneManager  = {}
+local canvas        = {}
+local shader        = {}
+local scanlinePhase = 0
 
 -- === Game scenes ===
-local scenes = {
+local scenes        = {
     title = require("src.scenes.title_scene"),
     main = require("src.scenes.main_scene"),
     lboard = require("src.scenes.lboard_scene"),
@@ -18,7 +22,7 @@ function sceneManager:load(assets, configs)
     self.next = nil
     self.transitioning = false
     self.coverX = nil -- For black rectangle
-    self.stage = nil -- 'in' -> switch -> 'out'
+    self.stage = nil  -- 'in' -> switch -> 'out'
     self.tween = nil
     self.actions = {
         switchScene = function(newScene)
@@ -26,6 +30,13 @@ function sceneManager:load(assets, configs)
         end,
         quit = function() love.event.quit() end
     }
+
+    canvas = lg.newCanvas()
+    shader = lg.newShader(res.SD_SCANLINE)
+    shader:send("width", 3)
+    shader:send("opacity", 0.4)
+    ---@diagnostic disable-next-line: missing-fields
+    shader:send("color", { 0.2, 0.2, 0.2 })
 
     -- Don't use transition on initial load
     scenes[self.current]:load(self.assets, self.actions, self.configs)
@@ -73,6 +84,9 @@ function sceneManager:mousereleased(x, y, btn)
 end
 
 function sceneManager:update(dt)
+    scanlinePhase = scanlinePhase + dt * 10
+    shader:send("phase", scanlinePhase)
+
     if self.transitioning and self.tween then
         local complete = self.tween:update(dt)
         if complete then
@@ -102,6 +116,7 @@ function sceneManager:update(dt)
 end
 
 function sceneManager:draw()
+    lg.setCanvas(canvas)
     if scenes[self.current].draw then
         scenes[self.current]:draw()
     end
@@ -111,6 +126,11 @@ function sceneManager:draw()
         lg.setColor(colors.SLATE_100)
         lg.rectangle("fill", self.coverX, 0, lg.getWidth(), lg.getHeight())
     end
+    lg.setCanvas()
+
+    lg.setShader(shader)
+    lg.draw(canvas)
+    lg.setShader()
 end
 
 return sceneManager
